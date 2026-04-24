@@ -11,7 +11,7 @@ Each stack lives in its own Docker Compose file. Custom images (where needed) us
 ## Philosophy
 
 - **Dedicated compose file per stack** — bring up only what you need, independently
-- **Host-mounted storage** — all persistent data lives under `/mnt/docker/<service>`, no named volumes
+- **Host-mounted storage** — all persistent data lives under `${HOST_MOUNT_ROOT:-/mnt/docker}/<service>`, no named volumes
 - **UID/GID passthrough** — every service runs as the invoking user's UID/GID, sourced at `just` runtime, no permission errors ever
 - **`.env` for all config and secrets** — `.env.example` documents every required variable including timezone
 - **`just` for everything** — one recipe to bring up the full stack, or granular per-stack control
@@ -74,7 +74,7 @@ homelab/
 | Service | Role |
 |---------|------|
 | Gitea | Self-hosted Git forge |
-| GitHub Actions Runner | Personal self-hosted CI runner for GitHub repos (e.g. building images, pushing to ECS) |
+| GitHub Actions Runner | Personal self-hosted CI runner for GitHub repos (e.g. building images, pushing to ECS). Opt-in profile (`just up-runner`). |
 
 ### Obs
 | Service | Role |
@@ -108,7 +108,17 @@ Gitea exposes Git-over-SSH on host port `2222` so it does not collide with the h
 
 ### Host Storage
 
-All persistent data is host-mounted under `/mnt/docker/`. The `justfile` runs `mkdir -p` for every required path before any stack boots.
+All persistent data is host-mounted under `${HOST_MOUNT_ROOT:-/mnt/docker}`. The `justfile` runs `mkdir -p` for every required path before any stack boots.
+
+- If `HOST_MOUNT_ROOT` is not set, the default is `/mnt/docker`.
+- For local laptops/dev boxes without write access to `/mnt`, set `HOST_MOUNT_ROOT` in `.env` (for example: `/home/<user>/homelab-data`).
+
+If DNS port 53 is already used on your machine (common on laptops via `systemd-resolved`), set these in `.env` for local testing:
+
+- `ADGUARD_DNS_PORT_TCP=5353`
+- `ADGUARD_DNS_PORT_UDP=5353`
+
+Production can keep both at `53` when the host is dedicated.
 
 ```
 /mnt/docker/
@@ -133,7 +143,7 @@ All persistent data is host-mounted under `/mnt/docker/`. The `justfile` runs `m
 
 Directories are created with ownership set to the UID/GID of the user running `just`. Services are configured with the same UID/GID via `PUID`/`PGID` in `.env`.
 
-For the GitHub runner, workspace and runner registration state are persisted separately under `/mnt/docker/gh-runner/work` and `/mnt/docker/gh-runner/config` so container recreation does not force a fresh runner registration.
+For the GitHub runner, workspace and runner registration state are persisted separately under `${HOST_MOUNT_ROOT:-/mnt/docker}/gh-runner/work` and `${HOST_MOUNT_ROOT:-/mnt/docker}/gh-runner/config` so container recreation does not force a fresh runner registration.
 
 ---
 
@@ -201,6 +211,9 @@ just up-dev
 just up-obs
 just up-auth
 
+# Runner is opt-in (requires runner env vars)
+just up-runner
+
 # Extras are always explicit
 just up-extras
 
@@ -228,7 +241,7 @@ By default, Caddy uses `tls internal`. That means Caddy acts as its own private 
 
 - This is **not** using Tailscale-issued certificates.
 - It works well for a private tailnet because traffic is still fully encrypted.
-- Your devices will only trust those certs after you import Caddy's root CA from `/mnt/docker/caddy/data/caddy/pki/authorities/local/root.crt`.
+- Your devices will only trust those certs after you import Caddy's root CA from `${HOST_MOUNT_ROOT:-/mnt/docker}/caddy/data/caddy/pki/authorities/local/root.crt`.
 
 If you later want browser-trusted certs without importing a custom CA, there are two upgrade paths:
 
@@ -258,6 +271,8 @@ See `.env.example` for the full list. Key categories:
 | Nextcloud | `NEXTCLOUD_ADMIN_USER`, `NEXTCLOUD_ADMIN_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD` |
 | Authentik | `AUTHENTIK_SECRET_KEY`, `AUTHENTIK_POSTGRES_PASSWORD` |
 | GitHub Runner | `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO` |
+
+`just up-dev` starts Gitea only. Start the GitHub runner explicitly with `just up-runner` after setting runner credentials in `.env`.
 
 ## Healthchecks
 

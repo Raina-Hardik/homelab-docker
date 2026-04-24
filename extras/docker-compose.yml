@@ -12,7 +12,7 @@ services:
       - WEBSOCKET_ENABLED=true
       - DOMAIN=https://vault.${TS_DOMAIN}
     volumes:
-      - /mnt/docker/vaultwarden:/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/vaultwarden:/data
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[v]aultwarden'" ]
       interval: 30s
@@ -38,7 +38,7 @@ services:
       - N8N_PROTOCOL=https
       - WEBHOOK_URL=https://n8n.${TS_DOMAIN}
     volumes:
-      - /mnt/docker/n8n:/home/node/.n8n
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/n8n:/home/node/.n8n
     healthcheck:
       test: [ "CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5678/healthz', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\"" ]
       interval: 30s

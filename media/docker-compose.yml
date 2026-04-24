@@ -18,7 +18,7 @@ services:
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/gluetun:/gluetun
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gluetun:/gluetun
     # Port 8080 is the qBittorrent Web UI — exposed here since qBittorrent shares
     # this container's network. Remove the host-port once Caddy is routing to it.
     ports:
@@ -49,8 +49,8 @@ services:
       - TZ=${TZ}
       - WEBUI_PORT=8080
     volumes:
-      - /mnt/docker/qbittorrent:/config
-      - /mnt/docker/downloads:/downloads
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/qbittorrent:/config
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[q]bittorrent-nox'" ]
       interval: 30s
@@ -68,9 +68,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/jellyfin:/config
-      - /mnt/docker/media/tv:/data/tvshows
-      - /mnt/docker/media/movies:/data/movies
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/jellyfin:/config
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/tv:/data/tvshows
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/movies:/data/movies
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[j]ellyfin'" ]
       interval: 30s
@@ -90,9 +90,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/sonarr:/config
-      - /mnt/docker/media/tv:/tv
-      - /mnt/docker/downloads:/downloads
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/sonarr:/config
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/tv:/tv
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[S]onarr'" ]
       interval: 30s
@@ -111,9 +111,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/radarr:/config
-      - /mnt/docker/media/movies:/movies
-      - /mnt/docker/downloads:/downloads
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/radarr:/config
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/movies:/movies
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[R]adarr'" ]
       interval: 30s
@@ -132,7 +132,7 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/prowlarr:/config
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/prowlarr:/config
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[P]rowlarr'" ]
       interval: 30s

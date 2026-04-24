@@ -17,7 +17,7 @@ services:
       - DB_DATABASE_NAME=immich
       - REDIS_HOSTNAME=immich-redis
     volumes:
-      - /mnt/docker/immich/upload:/usr/src/app/upload
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/upload:/usr/src/app/upload
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[n]ode.*immich'" ]
       interval: 30s
@@ -32,7 +32,7 @@ services:
     container_name: immich-machine-learning
     restart: unless-stopped
     volumes:
-      - /mnt/docker/immich/model-cache:/cache
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/model-cache:/cache
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[p]ython.*immich'" ]
       interval: 30s
@@ -65,7 +65,7 @@ services:
       - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
       - POSTGRES_DB=immich
     volumes:
-      - /mnt/docker/immich/db:/var/lib/postgresql/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/db:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U immich -d immich" ]
       interval: 30s
@@ -100,7 +100,7 @@ services:
       - OVERWRITEPROTOCOL=https
       - OVERWRITECLIURL=https://nextcloud.${TS_DOMAIN}
     volumes:
-      - /mnt/docker/nextcloud:/var/www/html
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud:/var/www/html
     healthcheck:
       test: [ "CMD-SHELL", "php occ status >/dev/null 2>&1" ]
       interval: 30s
@@ -121,7 +121,7 @@ services:
       - MYSQL_USER=${NEXTCLOUD_MYSQL_USER}
       - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
     volumes:
-      - /mnt/docker/nextcloud-db:/var/lib/mysql
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud-db:/var/lib/mysql
     healthcheck:
       test: [ "CMD-SHELL", "healthcheck.sh --connect --innodb_initialized" ]
       interval: 30s

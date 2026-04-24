@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
       - POSTGRES_DB=${AUTHENTIK_POSTGRES_DB}
     volumes:
-      - /mnt/docker/authentik/db:/var/lib/postgresql/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/db:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${AUTHENTIK_POSTGRES_USER} -d ${AUTHENTIK_POSTGRES_DB}" ]
       interval: 30s
@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     command: --save 60 1 --loglevel warning
     volumes:
-      - /mnt/docker/authentik/redis:/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/redis:/data
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 30s
@@ -55,8 +55,8 @@ services:
       - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_POSTGRES_DB}
       - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
     volumes:
-      - /mnt/docker/authentik/media:/media
-      - /mnt/docker/authentik/templates:/templates
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/media:/media
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/templates:/templates
     healthcheck:
       test: [ "CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/-/health/live/', timeout=5)\" >/dev/null 2>&1" ]
       interval: 30s
@@ -89,9 +89,9 @@ services:
       - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /mnt/docker/authentik/media:/media
-      - /mnt/docker/authentik/certs:/certs
-      - /mnt/docker/authentik/templates:/templates
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/media:/media
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/certs:/certs
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/templates:/templates
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[c]elery' || ps -ef | grep -q '[w]orker'" ]
       interval: 30s

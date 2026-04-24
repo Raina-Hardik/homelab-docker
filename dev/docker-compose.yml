@@ -19,7 +19,7 @@ services:
       - GITEA__server__SSH_PORT=2222
       - GITEA__server__START_SSH_SERVER=true
     volumes:
-      - /mnt/docker/gitea:/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gitea:/data
     healthcheck:
       test: [ "CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/healthz || exit 1" ]
       interval: 30s
@@ -39,6 +39,7 @@ services:
   gh-runner:
     image: myoung34/github-runner:latest
     container_name: gh-runner
+    profiles: [ "runner" ]
     restart: unless-stopped
     depends_on:
       gitea:
@@ -54,8 +55,8 @@ services:
       - UNSET_CONFIG_VARS=true
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/gh-runner/config:/runner
-      - /mnt/docker/gh-runner/work:/_work
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gh-runner/config:/runner
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gh-runner/work:/_work
       # Docker socket lets the runner build and push images without DinD
       - /var/run/docker.sock:/var/run/docker.sock
     healthcheck:

@@ -4,11 +4,11 @@ services:
   # After first boot, open the UI, add a system, and copy the generated public key
   # into BESZEL_KEY in your .env, then restart beszel-agent.
   beszel:
-    image: ghcr.io/henrygd/beszel:latest
+    image: henrygd/beszel:latest
     container_name: beszel
     restart: unless-stopped
     volumes:
-      - /mnt/docker/beszel:/beszel/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/beszel:/beszel/data
     # Allows the hub to reach the agent running on the host network at port 45876
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -26,7 +26,7 @@ services:
   # CPU/RAM/disk stats. The hub connects to it at host.docker.internal:45876.
   # In the Beszel UI, add the system with address: host.docker.internal:45876
   beszel-agent:
-    image: ghcr.io/henrygd/beszel-agent:latest
+    image: henrygd/beszel-agent:latest
     container_name: beszel-agent
     restart: unless-stopped
     network_mode: host
@@ -70,7 +70,7 @@ services:
     container_name: uptime-kuma
     restart: unless-stopped
     volumes:
-      - /mnt/docker/uptime-kuma:/app/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/uptime-kuma:/app/data
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[u]ptime-kuma'" ]
       interval: 30s

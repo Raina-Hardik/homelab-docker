@@ -18,6 +18,7 @@ set dotenv-load := true
 # This ensures host-mounted directories are always owned by the right user.
 export PUID := `id -u`
 export PGID := `id -g`
+host_mount_root := env_var_or_default('HOST_MOUNT_ROOT', '/mnt/docker')
 
 # ── Default ───────────────────────────────────────────────────────────────────
 
@@ -36,37 +37,37 @@ _network:
 
 _mkdirs:
     mkdir -p \
-        /mnt/docker/adguard/work \
-        /mnt/docker/adguard/conf \
-        /mnt/docker/caddy/data \
-        /mnt/docker/caddy/config \
-        /mnt/docker/gluetun \
-        /mnt/docker/qbittorrent \
-        /mnt/docker/downloads \
-        /mnt/docker/media/tv \
-        /mnt/docker/media/movies \
-        /mnt/docker/jellyfin \
-        /mnt/docker/sonarr \
-        /mnt/docker/radarr \
-        /mnt/docker/prowlarr \
-        /mnt/docker/immich/upload \
-        /mnt/docker/immich/model-cache \
-        /mnt/docker/immich/db \
-        /mnt/docker/nextcloud \
-        /mnt/docker/nextcloud-db \
-        /mnt/docker/gitea \
-        /mnt/docker/gh-runner/config \
-        /mnt/docker/gh-runner/work \
-        /mnt/docker/beszel \
-        /mnt/docker/uptime-kuma \
-        /mnt/docker/authentik/db \
-        /mnt/docker/authentik/redis \
-        /mnt/docker/authentik/media \
-        /mnt/docker/authentik/certs \
-        /mnt/docker/authentik/templates \
-        /mnt/docker/vaultwarden \
-        /mnt/docker/n8n
-    @echo "Host directories ready under /mnt/docker/"
+        {{host_mount_root}}/adguard/work \
+        {{host_mount_root}}/adguard/conf \
+        {{host_mount_root}}/caddy/data \
+        {{host_mount_root}}/caddy/config \
+        {{host_mount_root}}/gluetun \
+        {{host_mount_root}}/qbittorrent \
+        {{host_mount_root}}/downloads \
+        {{host_mount_root}}/media/tv \
+        {{host_mount_root}}/media/movies \
+        {{host_mount_root}}/jellyfin \
+        {{host_mount_root}}/sonarr \
+        {{host_mount_root}}/radarr \
+        {{host_mount_root}}/prowlarr \
+        {{host_mount_root}}/immich/upload \
+        {{host_mount_root}}/immich/model-cache \
+        {{host_mount_root}}/immich/db \
+        {{host_mount_root}}/nextcloud \
+        {{host_mount_root}}/nextcloud-db \
+        {{host_mount_root}}/gitea \
+        {{host_mount_root}}/gh-runner/config \
+        {{host_mount_root}}/gh-runner/work \
+        {{host_mount_root}}/beszel \
+        {{host_mount_root}}/uptime-kuma \
+        {{host_mount_root}}/authentik/db \
+        {{host_mount_root}}/authentik/redis \
+        {{host_mount_root}}/authentik/media \
+        {{host_mount_root}}/authentik/certs \
+        {{host_mount_root}}/authentik/templates \
+        {{host_mount_root}}/vaultwarden \
+        {{host_mount_root}}/n8n
+    @echo "Host directories ready under {{host_mount_root}}/"
 
 # ── Full stack (excludes extras) ──────────────────────────────────────────────
 
@@ -121,6 +122,17 @@ down-dev:
 
 logs-dev:
     docker compose -f dev/docker-compose.yml logs -f
+
+# ── GitHub Runner (opt-in profile under dev stack) ───────────────────────────
+
+up-runner:
+    docker compose -f dev/docker-compose.yml --profile runner up -d gh-runner
+
+down-runner:
+    docker compose -f dev/docker-compose.yml --profile runner rm -sf gh-runner
+
+logs-runner:
+    docker compose -f dev/docker-compose.yml --profile runner logs -f gh-runner
 
 # ── Obs ───────────────────────────────────────────────────────────────────────
 
