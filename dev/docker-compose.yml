@@ -1,0 +1,46 @@
+services:
+  # ── Gitea ─────────────────────────────────────────────────────────────────────
+  gitea:
+    image: gitea/gitea:latest
+    container_name: gitea
+    restart: unless-stopped
+    environment:
+      - USER_UID=${PUID}
+      - USER_GID=${PGID}
+      - TZ=${TZ}
+      - GITEA__server__DOMAIN=gitea.${TS_DOMAIN}
+      - GITEA__server__ROOT_URL=https://gitea.${TS_DOMAIN}
+      - GITEA__server__SSH_DOMAIN=gitea.${TS_DOMAIN}
+    volumes:
+      - /mnt/docker/gitea:/data
+    networks:
+      - homelab
+
+  # ── GitHub Actions Runner ─────────────────────────────────────────────────────
+  # Personal runner scoped to a single repo. Useful for tasks like building Docker
+  # images, pushing to ECS, running tests, etc. on your own hardware.
+  #
+  # GITHUB_RUNNER_TOKEN: generate a runner registration token from:
+  # GitHub repo → Settings → Actions → Runners → New self-hosted runner
+  # The token is single-use and expires after 1 hour. Regenerate if needed.
+  gh-runner:
+    image: myoung34/github-runner:latest
+    container_name: gh-runner
+    restart: unless-stopped
+    environment:
+      - RUNNER_SCOPE=repo
+      - REPO_URL=${GITHUB_RUNNER_REPO}
+      - ACCESS_TOKEN=${GITHUB_RUNNER_TOKEN}
+      - RUNNER_NAME=${GITHUB_RUNNER_NAME}
+      - LABELS=homelab,self-hosted,linux,x64
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker/gh-runner:/home/runner/work
+      # Docker socket lets the runner build and push images without DinD
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

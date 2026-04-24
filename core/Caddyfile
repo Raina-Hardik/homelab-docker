@@ -1,0 +1,111 @@
+# Homelab Caddyfile
+#
+# All site addresses use {$TS_DOMAIN} which Caddy expands from the TS_DOMAIN
+# environment variable at startup. Set TS_DOMAIN in your .env file.
+#
+# TLS strategy: "tls internal" — Caddy acts as its own CA and issues self-signed certs.
+# This works great for Tailscale-only access. To trust the cert on your devices, export
+# the Caddy root CA from /data/caddy/pki/authorities/local/root.crt and add it to your
+# OS/browser trust store.
+#
+# If you have a real public domain with DNS pointing to your server, replace
+# "tls internal" with "tls {$ACME_EMAIL}" to use Let's Encrypt.
+
+{
+    email {$ACME_EMAIL}
+}
+
+# ── Core ─────────────────────────────────────────────────────────────────────
+
+adguard.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy adguard:3000
+}
+
+# ── Media ─────────────────────────────────────────────────────────────────────
+
+jellyfin.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy jellyfin:8096
+}
+
+sonarr.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy sonarr:8989
+}
+
+radarr.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy radarr:7878
+}
+
+prowlarr.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy prowlarr:9696
+}
+
+# qBittorrent traffic exits through Gluetun — proxy via the gluetun container
+qbit.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy gluetun:8080
+}
+
+# ── Cloud ─────────────────────────────────────────────────────────────────────
+
+immich.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy immich-server:2283
+}
+
+nextcloud.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy nextcloud:80
+
+    # Required for Nextcloud: pass real IP and correct headers
+    header_up Host {host}
+    header_up X-Forwarded-Proto https
+    header_up X-Forwarded-For {remote_host}
+}
+
+# ── Dev ───────────────────────────────────────────────────────────────────────
+
+gitea.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy gitea:3000
+}
+
+# ── Obs ───────────────────────────────────────────────────────────────────────
+
+beszel.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy beszel:8090
+}
+
+dozzle.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy dozzle:8080
+}
+
+uptime.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy uptime-kuma:3001
+}
+
+# ── Auth ──────────────────────────────────────────────────────────────────────
+
+auth.{$TS_DOMAIN} {
+    tls internal
+    reverse_proxy authentik-server:9000
+}
+
+# ── Extras (uncomment when extras stack is running) ───────────────────────────
+
+# vault.{$TS_DOMAIN} {
+#     tls internal
+#     reverse_proxy vaultwarden:80
+# }
+
+# n8n.{$TS_DOMAIN} {
+#     tls internal
+#     reverse_proxy n8n:5678
+# }

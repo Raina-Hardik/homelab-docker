@@ -1,0 +1,41 @@
+services:
+  # ── Vaultwarden ───────────────────────────────────────────────────────────────
+  # Bitwarden-compatible self-hosted password manager.
+  # Leave VAULTWARDEN_ADMIN_TOKEN empty to disable the /admin panel entirely.
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - ADMIN_TOKEN=${VAULTWARDEN_ADMIN_TOKEN}
+      - WEBSOCKET_ENABLED=true
+      - DOMAIN=https://vault.${TS_DOMAIN}
+    volumes:
+      - /mnt/docker/vaultwarden:/data
+    networks:
+      - homelab
+
+  # ── n8n ───────────────────────────────────────────────────────────────────────
+  # Workflow automation. All credentials are encrypted at rest via N8N_ENCRYPTION_KEY.
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_BASIC_AUTH_USER}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_BASIC_AUTH_PASSWORD}
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
+      - N8N_HOST=n8n.${TS_DOMAIN}
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n.${TS_DOMAIN}
+    volumes:
+      - /mnt/docker/n8n:/home/node/.n8n
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

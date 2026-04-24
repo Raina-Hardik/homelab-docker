@@ -1,0 +1,78 @@
+services:
+  # ── Authentik DB ──────────────────────────────────────────────────────────────
+  authentik-db:
+    image: postgres:16-alpine
+    container_name: authentik-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${AUTHENTIK_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
+      - POSTGRES_DB=${AUTHENTIK_POSTGRES_DB}
+    volumes:
+      - /mnt/docker/authentik/db:/var/lib/postgresql/data
+    networks:
+      - homelab
+
+  authentik-redis:
+    image: redis:7-alpine
+    container_name: authentik-redis
+    restart: unless-stopped
+    command: --save 60 1 --loglevel warning
+    volumes:
+      - /mnt/docker/authentik/redis:/data
+    networks:
+      - homelab
+
+  # ── Authentik Server (Web UI + API) ───────────────────────────────────────────
+  authentik-server:
+    image: ghcr.io/goauthentik/server:latest
+    container_name: authentik-server
+    restart: unless-stopped
+    command: server
+    depends_on:
+      - authentik-db
+      - authentik-redis
+    environment:
+      - TZ=${TZ}
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-db
+      - AUTHENTIK_POSTGRESQL__USER=${AUTHENTIK_POSTGRES_USER}
+      - AUTHENTIK_POSTGRESQL__PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
+      - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_POSTGRES_DB}
+      - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
+    volumes:
+      - /mnt/docker/authentik/media:/media
+      - /mnt/docker/authentik/templates:/templates
+    networks:
+      - homelab
+
+  # ── Authentik Worker (background tasks) ───────────────────────────────────────
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:latest
+    container_name: authentik-worker
+    restart: unless-stopped
+    command: worker
+    depends_on:
+      - authentik-db
+      - authentik-redis
+    # Worker runs as root to manage certs and Docker integrations
+    user: root
+    environment:
+      - TZ=${TZ}
+      - AUTHENTIK_REDIS__HOST=authentik-redis
+      - AUTHENTIK_POSTGRESQL__HOST=authentik-db
+      - AUTHENTIK_POSTGRESQL__USER=${AUTHENTIK_POSTGRES_USER}
+      - AUTHENTIK_POSTGRESQL__PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
+      - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_POSTGRES_DB}
+      - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /mnt/docker/authentik/media:/media
+      - /mnt/docker/authentik/certs:/certs
+      - /mnt/docker/authentik/templates:/templates
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

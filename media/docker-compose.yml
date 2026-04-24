@@ -1,0 +1,110 @@
+services:
+  # ── VPN Tunnel ───────────────────────────────────────────────────────────────
+  # All qBittorrent traffic is forced through Gluetun (ProtonVPN).
+  # qBittorrent shares Gluetun's network namespace — it has no network of its own.
+  # Ports for the qBittorrent Web UI are published here on the Gluetun container.
+  gluetun:
+    image: qmcgaw/gluetun:latest
+    container_name: gluetun
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
+      - VPN_TYPE=${VPN_TYPE}
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker/gluetun:/gluetun
+    # Port 8080 is the qBittorrent Web UI — exposed here since qBittorrent shares
+    # this container's network. Remove the host-port once Caddy is routing to it.
+    ports:
+      - "8080:8080"
+    networks:
+      - homelab
+
+  # ── Torrent Client ────────────────────────────────────────────────────────────
+  # network_mode: service:gluetun forces ALL traffic through the VPN tunnel.
+  # Do NOT add this service to the homelab network — it has no independent network.
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    network_mode: "service:gluetun"
+    depends_on:
+      - gluetun
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+    volumes:
+      - /mnt/docker/qbittorrent:/config
+      - /mnt/docker/downloads:/downloads
+
+  # ── Media Server ──────────────────────────────────────────────────────────────
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker/jellyfin:/config
+      - /mnt/docker/media/tv:/data/tvshows
+      - /mnt/docker/media/movies:/data/movies
+    networks:
+      - homelab
+
+  # ── Automation ────────────────────────────────────────────────────────────────
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker/sonarr:/config
+      - /mnt/docker/media/tv:/tv
+      - /mnt/docker/downloads:/downloads
+    networks:
+      - homelab
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker/radarr:/config
+      - /mnt/docker/media/movies:/movies
+      - /mnt/docker/downloads:/downloads
+    networks:
+      - homelab
+
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - /mnt/docker/prowlarr:/config
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

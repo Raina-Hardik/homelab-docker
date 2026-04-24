@@ -1,0 +1,90 @@
+services:
+  # ── Immich ────────────────────────────────────────────────────────────────────
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:release
+    container_name: immich-server
+    restart: unless-stopped
+    depends_on:
+      - immich-db
+      - immich-redis
+    environment:
+      - TZ=${TZ}
+      - DB_HOSTNAME=immich-db
+      - DB_USERNAME=immich
+      - DB_PASSWORD=${IMMICH_DB_PASSWORD}
+      - DB_DATABASE_NAME=immich
+      - REDIS_HOSTNAME=immich-redis
+    volumes:
+      - /mnt/docker/immich/upload:/usr/src/app/upload
+    networks:
+      - homelab
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    container_name: immich-machine-learning
+    restart: unless-stopped
+    volumes:
+      - /mnt/docker/immich/model-cache:/cache
+    networks:
+      - homelab
+
+  immich-redis:
+    image: redis:6.2-alpine
+    container_name: immich-redis
+    restart: unless-stopped
+    networks:
+      - homelab
+
+  immich-db:
+    # pgvecto-rs is required by Immich for vector similarity search (smart search / faces)
+    image: tensorchord/pgvecto-rs:pg14-v0.2.0
+    container_name: immich-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=immich
+      - POSTGRES_PASSWORD=${IMMICH_DB_PASSWORD}
+      - POSTGRES_DB=immich
+    volumes:
+      - /mnt/docker/immich/db:/var/lib/postgresql/data
+    networks:
+      - homelab
+
+  # ── Nextcloud ─────────────────────────────────────────────────────────────────
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    depends_on:
+      - nextcloud-db
+    environment:
+      - TZ=${TZ}
+      - MYSQL_HOST=nextcloud-db
+      - MYSQL_DATABASE=${NEXTCLOUD_MYSQL_DATABASE}
+      - MYSQL_USER=${NEXTCLOUD_MYSQL_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
+      - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
+      - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
+      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.${TS_DOMAIN}
+    volumes:
+      - /mnt/docker/nextcloud:/var/www/html
+    networks:
+      - homelab
+
+  nextcloud-db:
+    image: mariadb:11
+    container_name: nextcloud-db
+    restart: unless-stopped
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    environment:
+      - MYSQL_ROOT_PASSWORD=${NEXTCLOUD_MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${NEXTCLOUD_MYSQL_DATABASE}
+      - MYSQL_USER=${NEXTCLOUD_MYSQL_USER}
+      - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
+    volumes:
+      - /mnt/docker/nextcloud-db:/var/lib/mysql
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

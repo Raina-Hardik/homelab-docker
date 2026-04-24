@@ -1,0 +1,43 @@
+services:
+  adguard:
+    image: adguard/adguardhome:latest
+    container_name: adguard
+    restart: unless-stopped
+    volumes:
+      - /mnt/docker/adguard/work:/opt/adguardhome/work
+      - /mnt/docker/adguard/conf:/opt/adguardhome/conf
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      # Initial setup UI — accessible at http://<host-ip>:3000 before Caddy is configured.
+      # After first-run setup, AdGuard serves its UI on the port you configure (default 80 inside
+      # container). Remove this host-port binding once Caddy is routing to it.
+      - "3000:3000/tcp"
+    environment:
+      - TZ=${TZ}
+    networks:
+      - homelab
+
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp" # HTTP/3
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /mnt/docker/caddy/data:/data
+      - /mnt/docker/caddy/config:/config
+    environment:
+      - TZ=${TZ}
+      - TS_DOMAIN=${TS_DOMAIN}
+      - LOCAL_DOMAIN=${LOCAL_DOMAIN}
+      - ACME_EMAIL=${ACME_EMAIL}
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
