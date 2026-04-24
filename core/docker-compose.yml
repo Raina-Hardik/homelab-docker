@@ -15,6 +15,12 @@ services:
       - "3000:3000/tcp"
     environment:
       - TZ=${TZ}
+    healthcheck:
+      test: [ "CMD-SHELL", "ps -ef | grep -q '[A]dGuardHome'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
     networks:
       - homelab
 
@@ -35,6 +41,15 @@ services:
       - TS_DOMAIN=${TS_DOMAIN}
       - LOCAL_DOMAIN=${LOCAL_DOMAIN}
       - ACME_EMAIL=${ACME_EMAIL}
+    depends_on:
+      adguard:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - homelab
 

@@ -13,6 +13,12 @@ services:
       - DOMAIN=https://vault.${TS_DOMAIN}
     volumes:
       - /mnt/docker/vaultwarden:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "ps -ef | grep -q '[v]aultwarden'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
     networks:
       - homelab
 
@@ -33,6 +39,12 @@ services:
       - WEBHOOK_URL=https://n8n.${TS_DOMAIN}
     volumes:
       - /mnt/docker/n8n:/home/node/.n8n
+    healthcheck:
+      test: [ "CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5678/healthz', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))\"" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
     networks:
       - homelab
 

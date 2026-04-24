@@ -5,8 +5,10 @@ services:
     container_name: immich-server
     restart: unless-stopped
     depends_on:
-      - immich-db
-      - immich-redis
+      immich-db:
+        condition: service_healthy
+      immich-redis:
+        condition: service_healthy
     environment:
       - TZ=${TZ}
       - DB_HOSTNAME=immich-db
@@ -16,6 +18,12 @@ services:
       - REDIS_HOSTNAME=immich-redis
     volumes:
       - /mnt/docker/immich/upload:/usr/src/app/upload
+    healthcheck:
+      test: [ "CMD-SHELL", "ps -ef | grep -q '[n]ode.*immich'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
     networks:
       - homelab
 
@@ -25,6 +33,12 @@ services:
     restart: unless-stopped
     volumes:
       - /mnt/docker/immich/model-cache:/cache
+    healthcheck:
+      test: [ "CMD-SHELL", "ps -ef | grep -q '[p]ython.*immich'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
     networks:
       - homelab
 
@@ -32,6 +46,12 @@ services:
     image: redis:6.2-alpine
     container_name: immich-redis
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - homelab
 
@@ -46,6 +66,12 @@ services:
       - POSTGRES_DB=immich
     volumes:
       - /mnt/docker/immich/db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U immich -d immich" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - homelab
 
@@ -55,7 +81,8 @@ services:
     container_name: nextcloud
     restart: unless-stopped
     depends_on:
-      - nextcloud-db
+      nextcloud-db:
+        condition: service_healthy
     environment:
       - TZ=${TZ}
       - MYSQL_HOST=nextcloud-db
@@ -74,6 +101,12 @@ services:
       - OVERWRITECLIURL=https://nextcloud.${TS_DOMAIN}
     volumes:
       - /mnt/docker/nextcloud:/var/www/html
+    healthcheck:
+      test: [ "CMD-SHELL", "php occ status >/dev/null 2>&1" ]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 90s
     networks:
       - homelab
 
@@ -89,6 +122,12 @@ services:
       - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
     volumes:
       - /mnt/docker/nextcloud-db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD-SHELL", "healthcheck.sh --connect --innodb_initialized" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - homelab
 

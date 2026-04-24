@@ -10,6 +10,12 @@ services:
       - POSTGRES_DB=${AUTHENTIK_POSTGRES_DB}
     volumes:
       - /mnt/docker/authentik/db:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${AUTHENTIK_POSTGRES_USER} -d ${AUTHENTIK_POSTGRES_DB}" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - homelab
 
@@ -20,6 +26,12 @@ services:
     command: --save 60 1 --loglevel warning
     volumes:
       - /mnt/docker/authentik/redis:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - homelab
 
@@ -30,8 +42,10 @@ services:
     restart: unless-stopped
     command: server
     depends_on:
-      - authentik-db
-      - authentik-redis
+      authentik-db:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
     environment:
       - TZ=${TZ}
       - AUTHENTIK_REDIS__HOST=authentik-redis
@@ -43,6 +57,12 @@ services:
     volumes:
       - /mnt/docker/authentik/media:/media
       - /mnt/docker/authentik/templates:/templates
+    healthcheck:
+      test: [ "CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/-/health/live/', timeout=5)\" >/dev/null 2>&1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
     networks:
       - homelab
 
@@ -53,8 +73,10 @@ services:
     restart: unless-stopped
     command: worker
     depends_on:
-      - authentik-db
-      - authentik-redis
+      authentik-db:
+        condition: service_healthy
+      authentik-redis:
+        condition: service_healthy
     # Worker runs as root to manage certs and Docker integrations
     user: root
     environment:
@@ -70,6 +92,12 @@ services:
       - /mnt/docker/authentik/media:/media
       - /mnt/docker/authentik/certs:/certs
       - /mnt/docker/authentik/templates:/templates
+    healthcheck:
+      test: [ "CMD-SHELL", "ps -ef | grep -q '[c]elery' || ps -ef | grep -q '[w]orker'" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
     networks:
       - homelab
 

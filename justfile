@@ -55,7 +55,8 @@ _mkdirs:
         /mnt/docker/nextcloud \
         /mnt/docker/nextcloud-db \
         /mnt/docker/gitea \
-        /mnt/docker/gh-runner \
+        /mnt/docker/gh-runner/config \
+        /mnt/docker/gh-runner/work \
         /mnt/docker/beszel \
         /mnt/docker/uptime-kuma \
         /mnt/docker/authentik/db \
@@ -158,7 +159,7 @@ logs-extras:
 
 # Show all running containers across every stack
 ps:
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+    docker ps --format "table {{{{.Names}}}}\t{{{{.Status}}}}\t{{{{.Ports}}}}"
 
 # Pull latest images for all stacks (extras included)
 pull:

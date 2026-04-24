@@ -104,6 +104,8 @@ All stacks share a single external Docker bridge network called `homelab`. This 
 
 **Exception:** qBittorrent uses `network_mode: service:gluetun` — its traffic exits entirely through the Gluetun VPN container.
 
+Gitea exposes Git-over-SSH on host port `2222` so it does not collide with the host's own SSH daemon on `22`.
+
 ### Host Storage
 
 All persistent data is host-mounted under `/mnt/docker/`. The `justfile` runs `mkdir -p` for every required path before any stack boots.
@@ -130,6 +132,8 @@ All persistent data is host-mounted under `/mnt/docker/`. The `justfile` runs `m
 ```
 
 Directories are created with ownership set to the UID/GID of the user running `just`. Services are configured with the same UID/GID via `PUID`/`PGID` in `.env`.
+
+For the GitHub runner, workspace and runner registration state are persisted separately under `/mnt/docker/gh-runner/work` and `/mnt/docker/gh-runner/config` so container recreation does not force a fresh runner registration.
 
 ---
 
@@ -254,6 +258,14 @@ See `.env.example` for the full list. Key categories:
 | Nextcloud | `NEXTCLOUD_ADMIN_USER`, `NEXTCLOUD_ADMIN_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `MYSQL_PASSWORD` |
 | Authentik | `AUTHENTIK_SECRET_KEY`, `AUTHENTIK_POSTGRES_PASSWORD` |
 | GitHub Runner | `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO` |
+
+## Healthchecks
+
+Every stack now defines container healthchecks so Docker has an actual readiness signal instead of only a running process state.
+
+- Databases and caches use native readiness checks such as `pg_isready`, `redis-cli ping`, and MariaDB's `healthcheck.sh`.
+- Dependency-heavy apps such as Immich, Nextcloud, Authentik, qBittorrent, and the GitHub runner gate startup with `depends_on: condition: service_healthy`.
+- The GitHub runner persists both working files and runner registration state, so recreating the container does not normally require re-registration.
 
 ---
 

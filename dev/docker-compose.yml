@@ -4,15 +4,28 @@ services:
     image: gitea/gitea:latest
     container_name: gitea
     restart: unless-stopped
+    ports:
+      # Git-over-SSH from the host on a non-conflicting port; keep host SSH on 22.
+      - "2222:22"
     environment:
       - USER_UID=${PUID}
       - USER_GID=${PGID}
       - TZ=${TZ}
+      - GITEA__server__PROTOCOL=http
+      - GITEA__server__HTTP_PORT=3000
       - GITEA__server__DOMAIN=gitea.${TS_DOMAIN}
       - GITEA__server__ROOT_URL=https://gitea.${TS_DOMAIN}
       - GITEA__server__SSH_DOMAIN=gitea.${TS_DOMAIN}
+      - GITEA__server__SSH_PORT=2222
+      - GITEA__server__START_SSH_SERVER=true
     volumes:
       - /mnt/docker/gitea:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/healthz || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
     networks:
       - homelab
 
@@ -27,17 +40,30 @@ services:
     image: myoung34/github-runner:latest
     container_name: gh-runner
     restart: unless-stopped
+    depends_on:
+      gitea:
+        condition: service_healthy
     environment:
       - RUNNER_SCOPE=repo
       - REPO_URL=${GITHUB_RUNNER_REPO}
       - ACCESS_TOKEN=${GITHUB_RUNNER_TOKEN}
       - RUNNER_NAME=${GITHUB_RUNNER_NAME}
       - LABELS=homelab,self-hosted,linux,x64
+      - RUNNER_WORKDIR=/_work
+      - CONFIGURED_ACTIONS_RUNNER_FILES_DIR=/runner
+      - UNSET_CONFIG_VARS=true
       - TZ=${TZ}
     volumes:
-      - /mnt/docker/gh-runner:/home/runner/work
+      - /mnt/docker/gh-runner/config:/runner
+      - /mnt/docker/gh-runner/work:/_work
       # Docker socket lets the runner build and push images without DinD
       - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: [ "CMD-SHELL", "test -f /runner/.runner && pgrep -f Runner.Listener >/dev/null" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       - homelab
 
