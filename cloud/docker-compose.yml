@@ -16,6 +16,7 @@ services:
       - DB_PASSWORD=${IMMICH_DB_PASSWORD}
       - DB_DATABASE_NAME=immich
       - REDIS_HOSTNAME=immich-redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/upload:/usr/src/app/upload
     healthcheck:
@@ -46,8 +47,9 @@ services:
     image: redis:6.2-alpine
     container_name: immich-redis
     restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD}
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: [ "CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping" ]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -83,12 +85,16 @@ services:
     depends_on:
       nextcloud-db:
         condition: service_healthy
+      immich-redis:
+        condition: service_healthy
     environment:
       - TZ=${TZ}
       - MYSQL_HOST=nextcloud-db
       - MYSQL_DATABASE=${NEXTCLOUD_MYSQL_DATABASE}
       - MYSQL_USER=${NEXTCLOUD_MYSQL_USER}
       - MYSQL_PASSWORD=${NEXTCLOUD_MYSQL_PASSWORD}
+      - REDIS_HOST=immich-redis
+      - REDIS_HOST_PASSWORD=${REDIS_PASSWORD}
       - NEXTCLOUD_ADMIN_USER=${NEXTCLOUD_ADMIN_USER}
       - NEXTCLOUD_ADMIN_PASSWORD=${NEXTCLOUD_ADMIN_PASSWORD}
       - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.${TS_DOMAIN}

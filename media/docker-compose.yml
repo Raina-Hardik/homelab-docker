@@ -63,6 +63,9 @@ services:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
     restart: unless-stopped
+    # Intel Quick Sync passthrough (works on 12th gen iGPU via /dev/dri)
+    devices:
+      - /dev/dri:/dev/dri
     environment:
       - PUID=${PUID}
       - PGID=${PGID}
