@@ -18,7 +18,7 @@ set dotenv-load := true
 # This ensures host-mounted directories are always owned by the right user.
 export PUID := `id -u`
 export PGID := `id -g`
-host_mount_root := env_var_or_default('HOST_MOUNT_ROOT', '/mnt/docker')
+host_mount_root := env('HOST_MOUNT_ROOT', './mnt/docker')
 
 # ── Default ───────────────────────────────────────────────────────────────────
 
