@@ -1,103 +1,19 @@
 services:
-  # ── Authentik DB ──────────────────────────────────────────────────────────────
-  authentik-db:
-    image: postgres:16-alpine
-    container_name: authentik-db
+  pocket-id:
+    image: ghcr.io/pocket-id/pocket-id:v2
     restart: unless-stopped
-    environment:
-      - POSTGRES_USER=${AUTHENTIK_POSTGRES_USER}
-      - POSTGRES_PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
-      - POSTGRES_DB=${AUTHENTIK_POSTGRES_DB}
+    env_file: .env
+    ports:
+      - 1411:1411
     volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/db:/var/lib/postgresql/data
+      - "./data:/app/data"
+    # Optional healthcheck
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${AUTHENTIK_POSTGRES_USER} -d ${AUTHENTIK_POSTGRES_DB}" ]
-      interval: 30s
+      test: ["CMD", "/app/pocket-id", "healthcheck"]
+      interval: 1m30s
       timeout: 5s
-      retries: 5
-      start_period: 15s
-    networks:
-      - homelab
-
-  authentik-redis:
-    image: redis:7-alpine
-    container_name: authentik-redis
-    restart: unless-stopped
-    command: --save 60 1 --loglevel warning
-    volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/redis:/data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 30s
-      timeout: 5s
-      retries: 5
+      retries: 2
       start_period: 10s
-    networks:
-      - homelab
-
-  # ── Authentik Server (Web UI + API) ───────────────────────────────────────────
-  authentik-server:
-    image: ghcr.io/goauthentik/server:latest
-    container_name: authentik-server
-    restart: unless-stopped
-    command: server
-    depends_on:
-      authentik-db:
-        condition: service_healthy
-      authentik-redis:
-        condition: service_healthy
-    environment:
-      - TZ=${TZ}
-      - AUTHENTIK_REDIS__HOST=authentik-redis
-      - AUTHENTIK_POSTGRESQL__HOST=authentik-db
-      - AUTHENTIK_POSTGRESQL__USER=${AUTHENTIK_POSTGRES_USER}
-      - AUTHENTIK_POSTGRESQL__PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
-      - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_POSTGRES_DB}
-      - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
-    volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/media:/media
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/templates:/templates
-    healthcheck:
-      test: [ "CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/-/health/live/', timeout=5)\" >/dev/null 2>&1" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 45s
-    networks:
-      - homelab
-
-  # ── Authentik Worker (background tasks) ───────────────────────────────────────
-  authentik-worker:
-    image: ghcr.io/goauthentik/server:latest
-    container_name: authentik-worker
-    restart: unless-stopped
-    command: worker
-    depends_on:
-      authentik-db:
-        condition: service_healthy
-      authentik-redis:
-        condition: service_healthy
-    # Worker runs as root to manage certs and Docker integrations
-    user: root
-    environment:
-      - TZ=${TZ}
-      - AUTHENTIK_REDIS__HOST=authentik-redis
-      - AUTHENTIK_POSTGRESQL__HOST=authentik-db
-      - AUTHENTIK_POSTGRESQL__USER=${AUTHENTIK_POSTGRES_USER}
-      - AUTHENTIK_POSTGRESQL__PASSWORD=${AUTHENTIK_POSTGRES_PASSWORD}
-      - AUTHENTIK_POSTGRESQL__NAME=${AUTHENTIK_POSTGRES_DB}
-      - AUTHENTIK_SECRET_KEY=${AUTHENTIK_SECRET_KEY}
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/media:/media
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/certs:/certs
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/authentik/templates:/templates
-    healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[c]elery' || ps -ef | grep -q '[w]orker'" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 45s
     networks:
       - homelab
 

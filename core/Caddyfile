@@ -58,6 +58,11 @@ prowlarr.{$TS_DOMAIN} {
 	import common_proxy prowlarr:9696
 }
 
+pocketid.{$TS_DOMAIN} {
+	import common
+	import common_proxy pocket-id:1411
+}
+
 # qBittorrent traffic exits through Gluetun — proxy via the gluetun container
 qbit.{$TS_DOMAIN} {
 	import common
