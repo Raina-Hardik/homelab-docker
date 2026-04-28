@@ -12,10 +12,16 @@
 # "tls internal" with "tls {$ACME_EMAIL}" to use Let's Encrypt.
 {
 	email {$ACME_EMAIL}
+
+	tailscale {
+		auth_key {$TS_AUTHKEY}
+	}
 }
 
 (common) {
-	tls internal
+	tls {
+		get_certificate tailscale
+	}
 	encode gzip zstd
 
 	header {
@@ -32,6 +38,7 @@
 # ── Core ─────────────────────────────────────────────────────────────────────
 
 adguard.{$TS_DOMAIN} {
+	bind tailscale/adguard
 	import common
 	import common_proxy adguard:3000
 }
@@ -39,32 +46,38 @@ adguard.{$TS_DOMAIN} {
 # ── Media ─────────────────────────────────────────────────────────────────────
 
 jellyfin.{$TS_DOMAIN} {
+	bind tailscale/jellyfin
 	import common
 	import common_proxy jellyfin:8096
 }
 
 sonarr.{$TS_DOMAIN} {
+	bind tailscale/sonarr
 	import common
 	import common_proxy sonarr:8989
 }
 
 radarr.{$TS_DOMAIN} {
+	bind tailscale/radarr
 	import common
 	import common_proxy radarr:7878
 }
 
 prowlarr.{$TS_DOMAIN} {
+	bind tailscale/prowlarr
 	import common
 	import common_proxy prowlarr:9696
 }
 
 pocketid.{$TS_DOMAIN} {
+	bind tailscale/pocket-id
 	import common
 	import common_proxy pocket-id:1411
 }
 
 # qBittorrent traffic exits through Gluetun — proxy via the gluetun container
 qbit.{$TS_DOMAIN} {
+	bind tailscale/qbit
 	import common
 	import common_proxy gluetun:8080
 }
@@ -72,11 +85,13 @@ qbit.{$TS_DOMAIN} {
 # ── Cloud ─────────────────────────────────────────────────────────────────────
 
 immich.{$TS_DOMAIN} {
+	bind tailscale/immich
 	import common
 	import common_proxy immich-server:2283
 }
 
 nextcloud.{$TS_DOMAIN} {
+	bind tailscale/nextcloud
 	import common
 	redir /.well-known/carddav /remote.php/dav/ 301
 	redir /.well-known/caldav /remote.php/dav/ 301
@@ -86,6 +101,7 @@ nextcloud.{$TS_DOMAIN} {
 # ── Dev ───────────────────────────────────────────────────────────────────────
 
 gitea.{$TS_DOMAIN} {
+	bind tailscale/gitea
 	import common
 	import common_proxy gitea:3000
 }
@@ -93,16 +109,19 @@ gitea.{$TS_DOMAIN} {
 # ── Obs ───────────────────────────────────────────────────────────────────────
 
 beszel.{$TS_DOMAIN} {
+	bind tailscale/beszel
 	import common
 	import common_proxy beszel:8090
 }
 
 dozzle.{$TS_DOMAIN} {
+	bind tailscale/dozzle
 	import common
 	import common_proxy dozzle:8080
 }
 
 uptime.{$TS_DOMAIN} {
+	bind tailscale/uptime
 	import common
 	import common_proxy uptime-kuma:3001
 }
@@ -110,6 +129,7 @@ uptime.{$TS_DOMAIN} {
 # ── Auth ──────────────────────────────────────────────────────────────────────
 
 auth.{$TS_DOMAIN} {
+	bind tailscale/auth
 	import common
 	import common_proxy authentik-server:9000
 }
@@ -117,11 +137,13 @@ auth.{$TS_DOMAIN} {
 # ── Extras (uncomment when extras stack is running) ───────────────────────────
 
 # vault.{$TS_DOMAIN} {
+#     bind tailscale/vault
 #     import common
 #     import common_proxy vaultwarden:80
 # }
 
 # n8n.{$TS_DOMAIN} {
+#     bind tailscale/n8n
 #     import common
 #     import common_proxy n8n:5678
 # }
