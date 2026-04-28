@@ -35,7 +35,7 @@ homelab/
 ├── obs/
 │   └── docker-compose.yml      # Beszel + Dozzle + Uptime Kuma
 ├── auth/
-│   └── docker-compose.yml      # Authentik
+│   └── docker-compose.yml      # pocketID
 ├── extras/
 │   └── docker-compose.yml      # Vaultwarden + n8n
 ├── .env                        # Your actual secrets (gitignored)
@@ -86,7 +86,7 @@ homelab/
 ### Auth
 | Service | Role |
 |---------|------|
-| Authentik | Identity provider and SSO — configure integrations manually after boot |
+| pocketID | Identity provider and SSO — configure integrations manually after boot |
 
 ### Extras *(opt-in only)*
 | Service | Role |
@@ -136,7 +136,7 @@ Production can keep both at `53` when the host is dedicated.
 ├── gh-runner/
 ├── beszel/
 ├── uptime-kuma/
-├── authentik/
+├── pocketid/
 ├── vaultwarden/
 └── n8n/
 ```
@@ -168,7 +168,7 @@ flowchart TD
     Caddy --> Beszel
     Caddy --> Dozzle
     Caddy --> UptimeKuma[Uptime Kuma]
-    Caddy --> Authentik
+    Caddy --> pocketID
     Caddy -.->|opt-in| Extras["Vaultwarden\nn8n"]
 ```
 
@@ -240,7 +240,7 @@ Then finish the parts that intentionally require UI-driven setup:
 
 1. AdGuard: visit `http://<host>:3000` and complete the first-run wizard.
 2. Beszel: open the self-hosted hub UI and fetch either a system `KEY` from `Add System` or a universal token from `/settings/tokens`.
-3. Authentik: create providers, applications, and policies in the UI.
+3. pocketID: create providers, applications, and policies in the UI.
 4. Uptime Kuma: add monitors in the UI.
 5. GitHub runner: only start it after you have a fresh runner registration token from GitHub.
 
@@ -328,7 +328,7 @@ See `.env.example` for the full list. Key categories:
 | Beszel | `BESZEL_KEY` |
 | Immich | `IMMICH_DB_PASSWORD` |
 | Nextcloud | `NEXTCLOUD_ADMIN_USER`, `NEXTCLOUD_ADMIN_PASSWORD`, `NEXTCLOUD_MYSQL_ROOT_PASSWORD`, `NEXTCLOUD_MYSQL_PASSWORD`, `NEXTCLOUD_MYSQL_DATABASE`, `NEXTCLOUD_MYSQL_USER` |
-| Authentik | `AUTHENTIK_SECRET_KEY`, `AUTHENTIK_POSTGRES_PASSWORD`, `AUTHENTIK_POSTGRES_USER`, `AUTHENTIK_POSTGRES_DB` |
+| pocketID | `POCKETID_SECRET_KEY`, `POCKETID_POSTGRES_PASSWORD`, `POCKETID_POSTGRES_USER`, `POCKETID_POSTGRES_DB` |
 | GitHub Runner | `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO`, `GITHUB_RUNNER_NAME` |
 | Extras | `VAULTWARDEN_ADMIN_TOKEN`, `N8N_BASIC_AUTH_USER`, `N8N_BASIC_AUTH_PASSWORD`, `N8N_ENCRYPTION_KEY` |
 
@@ -345,7 +345,7 @@ See `.env.example` for the full list. Key categories:
 | Cloud | Immich DB password, Nextcloud DB/admin/bootstrap values, domain-derived overwrite settings | Use `just up-cloud` after env changes | Immich libraries and most Nextcloud app settings are in-app after boot |
 | Dev | `TS_DOMAIN` for Gitea URLs, runner repo/token/name | Use `just up-dev` for Gitea env changes and `just up-runner` for runner env changes | Gitea repos/orgs/users are UI-managed |
 | Obs | `BESZEL_KEY` and future Beszel agent auth env, bind root | Use `just up-obs` after changing Beszel agent auth | Uptime Kuma monitors and Beszel system definitions come from the UI |
-| Auth | `AUTHENTIK_SECRET_KEY`, Postgres credentials, bind root | Use `just up-auth` after env changes | Authentik providers, applications, flows, and policies are UI-managed |
+| Auth | `POCKETID_SECRET_KEY`, Postgres credentials, bind root | Use `just up-auth` after env changes | pocketID providers, applications, flows, and policies are UI-managed |
 | Extras | Vaultwarden admin token, n8n auth and encryption key | Use `just up-extras` after env changes | Vaultwarden users/orgs and n8n workflows are UI-managed |
 
 ### Bootstrap-Sensitive Values
@@ -354,8 +354,8 @@ These values deserve extra care because changing them later may not fully rewrit
 
 - `NEXTCLOUD_ADMIN_USER` and `NEXTCLOUD_ADMIN_PASSWORD` are intended for first bootstrap of the mounted Nextcloud data directory.
 - `NEXTCLOUD_MYSQL_*` values are database bootstrap inputs; changing them later usually means coordinating MariaDB and Nextcloud state, not only recreating containers.
-- `AUTHENTIK_POSTGRES_*` values work the same way for Authentik's Postgres database.
-- `AUTHENTIK_SECRET_KEY` should be treated as persistent instance identity material, not something to rotate casually.
+- `POCKETID_POSTGRES_*` values work the same way for pocketID's Postgres database.
+- `POCKETID_SECRET_KEY` should be treated as persistent instance identity material, not something to rotate casually.
 - `N8N_ENCRYPTION_KEY` protects stored credentials at rest; changing it later can make existing encrypted credentials unreadable.
 - `GITHUB_RUNNER_TOKEN` is a short-lived registration token from GitHub; use a fresh one when registering or re-registering the runner.
 
