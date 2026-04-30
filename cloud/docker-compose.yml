@@ -20,7 +20,7 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/upload:/usr/src/app/upload
     healthcheck:
-      test: ["CMD", "node", "scripts/ping-check.js"]
+      test: ["CMD", "curl", "-f", "http://localhost:2283/server-info/ping"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -35,7 +35,7 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/model-cache:/cache
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[p]ython.*immich'" ]
+      test: ["CMD-SHELL", "python3 -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:3003/ping\")'"]
       interval: 30s
       timeout: 10s
       retries: 5
