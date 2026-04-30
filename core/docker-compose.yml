@@ -25,7 +25,7 @@ services:
       - homelab
 
   caddy:
-    image: caddy:latest
+    image: ghcr.io/tailscale/caddy-tailscale:main
     container_name: caddy
     restart: unless-stopped
     ports:
@@ -39,6 +39,7 @@ services:
     environment:
       - TZ=${TZ}
       - TS_DOMAIN=${TS_DOMAIN}
+      - TS_AUTHKEY=${TS_AUTHKEY}
       - LOCAL_DOMAIN=${LOCAL_DOMAIN}
       - ACME_EMAIL=${ACME_EMAIL}
     depends_on:

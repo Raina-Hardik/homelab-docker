@@ -287,7 +287,7 @@ Some required values are not made up manually. They come from a self-hosted UI o
 The `Caddyfile` is checked into the repo but contains **no hardcoded hostnames**. All domain names are injected via environment variables at runtime:
 
 ```
-{env.TS_DOMAIN}        # your Tailscale machine hostname (e.g. myserver.tail1234.ts.net)
+{env.TS_DOMAIN}        # your Tailscale tailnet name (e.g. tail1234.ts.net)
 {env.LOCAL_DOMAIN}     # your local domain if you have one (e.g. home.internal)
 ```
 
