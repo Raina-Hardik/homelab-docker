@@ -68,7 +68,7 @@ radarr.{$TS_DOMAIN} {
 prowlarr.{$TS_DOMAIN} {
 	bind tailscale/prowlarr
 	import common
-	import common_proxy prowlarr:9696
+	import common_proxy gluetun:9696
 }
 
 pocketid.{$TS_DOMAIN} {
