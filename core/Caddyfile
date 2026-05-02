@@ -72,7 +72,7 @@ prowlarr.{$TS_DOMAIN} {
 }
 
 pocketid.{$TS_DOMAIN} {
-	bind tailscale/pocket-id
+	bind tailscale/pocketid
 	import common
 	import common_proxy pocket-id:1411
 }
