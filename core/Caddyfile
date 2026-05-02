@@ -16,6 +16,7 @@
 	tailscale {
 		auth_key {$TS_AUTHKEY}
 		webui true
+		advertise_tags tag:homelab
 	}
 }
 

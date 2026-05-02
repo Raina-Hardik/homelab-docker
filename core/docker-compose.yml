@@ -36,8 +36,10 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/caddy/data:/data
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/caddy/config:/config
+      - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
     environment:
       - TZ=${TZ}
+      - TS_TAGS=tag:homelab
       - TS_DOMAIN=${TS_DOMAIN}
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TSNET_FORCE_LOGIN=1
