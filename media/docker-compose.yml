@@ -71,10 +71,13 @@ services:
       - PUID=${PUID}
       - PGID=${PGID}
       - TZ=${TZ}
+      - DOTNET_SYSTEM_NET_DISABLEIPV6=1
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/jellyfin:/config
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/tv:/data/tvshows
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/movies:/data/movies
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
     healthcheck:
       test: [ "CMD-SHELL", "ps -ef | grep -q '[j]ellyfin'" ]
       interval: 30s
