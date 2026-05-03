@@ -97,9 +97,9 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TZ}
-      - SEANIME_SERVER_HOST=0.0.0.0
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/seanime:/home/seanime/.config/Seanime
+      - ./seanime.config.toml:/home/seanime/.config/Seanime/config.toml
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media:/anime
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:

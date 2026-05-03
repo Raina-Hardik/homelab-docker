@@ -342,7 +342,9 @@ See `.env.example` for the full list. Key categories:
 - The service is exposed through Caddy at `https://anime.${TS_DOMAIN}`.
 - Seanime is configured to run rootless using Docker's native `user: "${PUID}:${PGID}"` mapping.
 - The Seanime config directory is persisted at `${HOST_MOUNT_ROOT:-/mnt/docker}/seanime`.
-- For hosted access, set a server password in Seanime's `config.toml` after first boot (as recommended by Seanime docs).
+- The repo-managed [media/seanime.config.toml](media/seanime.config.toml) is mounted directly to Seanime's expected `config.toml` path.
+- The tracked config currently sets the default Seanime password to `admin`.
+- Reverse-proxy trust is currently pinned to the `homelab` bridge subnet `172.18.0.0/16` in the mounted config.
 
 `just up-dev` starts Gitea only. Start the GitHub runner explicitly with `just up-runner` after setting runner credentials in `.env`.
 
