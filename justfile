@@ -50,6 +50,7 @@ _mkdirs:
         {{host_mount_root}}/media/tv \
         {{host_mount_root}}/media/movies \
         {{host_mount_root}}/jellyfin \
+        {{host_mount_root}}/seanime \
         {{host_mount_root}}/sonarr \
         {{host_mount_root}}/radarr \
         {{host_mount_root}}/prowlarr \

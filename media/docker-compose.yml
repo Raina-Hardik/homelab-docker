@@ -87,6 +87,30 @@ services:
     networks:
       - homelab
 
+  # ── Anime Client/Server ─────────────────────────────────────────────────────
+  # Community-maintained image recommended by Seanime docs for self-hosting.
+  # Exposed internally on the homelab network and published through Caddy.
+  seanime:
+    image: umagistr/seanime:latest-rootless
+    container_name: seanime
+    user: "${PUID}:${PGID}"
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - SEANIME_SERVER_HOST=0.0.0.0
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/seanime:/home/seanime/.config/Seanime
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media:/anime
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:43211 || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - homelab
+
   # ── Automation ────────────────────────────────────────────────────────────────
   sonarr:
     image: lscr.io/linuxserver/sonarr:latest

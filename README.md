@@ -58,6 +58,7 @@ homelab/
 | Service | Role |
 |---------|------|
 | Jellyfin | Media server |
+| Seanime | Self-hosted anime client/server (third-party Docker image) |
 | Sonarr | TV show automation |
 | Radarr | Movie automation |
 | Prowlarr | Indexer manager — feeds Sonarr and Radarr |
@@ -125,6 +126,7 @@ Production can keep both at `53` when the host is dedicated.
 ├── adguard/
 ├── caddy/
 ├── jellyfin/
+├── seanime/
 ├── sonarr/
 ├── radarr/
 ├── prowlarr/
@@ -162,6 +164,7 @@ flowchart TD
 
     Caddy --> AdGuard[AdGuard Home]
     Caddy --> Jellyfin
+    Caddy --> Seanime
     Caddy --> Immich
     Caddy --> Nextcloud
     Caddy --> Gitea
@@ -332,6 +335,15 @@ See `.env.example` for the full list. Key categories:
 | GitHub Runner | `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO`, `GITHUB_RUNNER_NAME` |
 | Extras | `VAULTWARDEN_ADMIN_TOKEN`, `N8N_BASIC_AUTH_USER`, `N8N_BASIC_AUTH_PASSWORD`, `N8N_ENCRYPTION_KEY` |
 
+### Seanime Notes
+
+- This setup uses the official Seanime docs' recommended third-party image `umagistr/seanime`.
+- Upstream note: this image is community-maintained and not maintained by Seanime.
+- The service is exposed through Caddy at `https://anime.${TS_DOMAIN}`.
+- Seanime is configured to run rootless using Docker's native `user: "${PUID}:${PGID}"` mapping.
+- The Seanime config directory is persisted at `${HOST_MOUNT_ROOT:-/mnt/docker}/seanime`.
+- For hosted access, set a server password in Seanime's `config.toml` after first boot (as recommended by Seanime docs).
+
 `just up-dev` starts Gitea only. Start the GitHub runner explicitly with `just up-runner` after setting runner credentials in `.env`.
 
 `PUID` and `PGID` still exist in `.env.example` for clarity, but `just` exports the runtime UID/GID of whoever invokes it, so the effective values come from the current shell user.
@@ -341,7 +353,7 @@ See `.env.example` for the full list. Key categories:
 | Stack | Values / setup | What changes need container recreation | What is UI-only after boot |
 |-------|----------------|----------------------------------------|----------------------------|
 | Core | `TZ`, `HOST_MOUNT_ROOT`, `ADGUARD_DNS_PORT_TCP`, `ADGUARD_DNS_PORT_UDP`, `TS_DOMAIN`, `LOCAL_DOMAIN`, `ACME_EMAIL` | Any `.env` change here should be applied with `just up-core` because ports, Caddy env, and bind mounts are container-level | AdGuard first-run setup on port `3000` writes app config to disk |
-| Media | ProtonVPN creds and provider settings, `TZ`, bind root | Use `just up-media` after env changes | Sonarr, Radarr, Prowlarr, qBittorrent, and Jellyfin are mainly configured in their UIs |
+| Media | ProtonVPN creds and provider settings, `TZ`, bind root | Use `just up-media` after env changes | Sonarr, Radarr, Prowlarr, qBittorrent, Jellyfin, and Seanime are mainly configured in their UIs |
 | Cloud | Immich DB password, Nextcloud DB/admin/bootstrap values, domain-derived overwrite settings | Use `just up-cloud` after env changes | Immich libraries and most Nextcloud app settings are in-app after boot |
 | Dev | `TS_DOMAIN` for Gitea URLs, runner repo/token/name | Use `just up-dev` for Gitea env changes and `just up-runner` for runner env changes | Gitea repos/orgs/users are UI-managed |
 | Obs | `BESZEL_KEY` and future Beszel agent auth env, bind root | Use `just up-obs` after changing Beszel agent auth | Uptime Kuma monitors and Beszel system definitions come from the UI |

@@ -53,6 +53,12 @@ jellyfin.{$TS_DOMAIN} {
 	import common_proxy jellyfin:8096
 }
 
+anime.{$TS_DOMAIN} {
+	bind tailscale/anime
+	import common
+	import common_proxy seanime:43211
+}
+
 sonarr.{$TS_DOMAIN} {
 	bind tailscale/sonarr
 	import common
