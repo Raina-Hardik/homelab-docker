@@ -40,6 +40,7 @@ _network:
 
 _mkdirs:
     mkdir -p \
+        {{host_mount_root}}/homepage \
         {{host_mount_root}}/adguard/work \
         {{host_mount_root}}/adguard/conf \
         {{host_mount_root}}/caddy/data \

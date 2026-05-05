@@ -45,6 +45,12 @@ adguard.{$TS_DOMAIN} {
 	import common_proxy adguard:3000
 }
 
+home.{$TS_DOMAIN} {
+	bind tailscale/home
+	import common
+	import common_proxy homepage:3000
+}
+
 # ── Media ─────────────────────────────────────────────────────────────────────
 
 jellyfin.{$TS_DOMAIN} {
