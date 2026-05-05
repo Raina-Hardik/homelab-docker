@@ -91,10 +91,12 @@ services:
   # Community-maintained image recommended by Seanime docs for self-hosting.
   # Exposed internally on the homelab network and published through Caddy.
   seanime:
-    image: umagistr/seanime:latest-rootless
+    image: umagistr/seanime:latest-hwaccel
     container_name: seanime
     user: "${PUID}:${PGID}"
     restart: unless-stopped
+    devices:
+      - /dev/dri:/dev/dri
     environment:
       - TZ=${TZ}
     volumes:
