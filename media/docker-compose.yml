@@ -12,6 +12,8 @@ services:
     devices:
       - /dev/net/tun:/dev/net/tun
     environment:
+      - VPN_PORT_FORWARDING=${VPN_PORT_FORWARDING}
+      - VPN_PORT_FORWARDING_PROVIDER=${VPN_PORT_FORWARDING_PROVIDER}
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
       - VPN_TYPE=${VPN_TYPE}
       - OPENVPN_USER=${OPENVPN_USER}
@@ -22,10 +24,12 @@ services:
     # Port 8080 is the qBittorrent Web UI — exposed here since qBittorrent shares
     # this container's network. Remove the host-port once Caddy is routing to it.
     ports:
-      - "8080:8080"  # qBittorrent
-      - "9696:9696"  # Prowlarr
+      - "8080:8080" # qBittorrent
+      - "9696:9696" # Prowlarr
+      - "6881:6881"
+      - "6881:6881/udp"
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[g]luetun'" ]
+      test: ["CMD-SHELL", "ps -ef | grep -q '[g]luetun'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -52,8 +56,9 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/qbittorrent:/config
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/anime:/anime
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[q]bittorrent-nox'" ]
+      test: ["CMD-SHELL", "ps -ef | grep -q '[q]bittorrent-nox'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -79,7 +84,7 @@ services:
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[j]ellyfin'" ]
+      test: ["CMD-SHELL", "ps -ef | grep -q '[j]ellyfin'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -105,7 +110,7 @@ services:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media:/anime
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
-      test: [ "CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:43211 || exit 1" ]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:43211 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -127,7 +132,7 @@ services:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/tv:/tv
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[S]onarr'" ]
+      test: ["CMD-SHELL", "ps -ef | grep -q '[S]onarr'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -148,7 +153,7 @@ services:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/movies:/movies
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[R]adarr'" ]
+      test: ["CMD-SHELL", "ps -ef | grep -q '[R]adarr'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -159,7 +164,7 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
-    network_mode: "service:gluetun"  # route through VPN
+    network_mode: "service:gluetun" # route through VPN
     depends_on:
       gluetun:
         condition: service_healthy
