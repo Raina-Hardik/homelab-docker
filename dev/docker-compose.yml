@@ -1,7 +1,7 @@
 services:
   # ── Gitea ─────────────────────────────────────────────────────────────────────
   gitea:
-    image: gitea/gitea:latest
+    image: codeberg.org/forgejo/forgejo:15
     container_name: gitea
     restart: unless-stopped
     ports:
@@ -21,7 +21,11 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/gitea:/data
     healthcheck:
-      test: [ "CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/healthz || exit 1" ]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://127.0.0.1:3000/api/healthz || exit 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -39,7 +43,7 @@ services:
   gh-runner:
     image: myoung34/github-runner:latest
     container_name: gh-runner
-    profiles: [ "runner" ]
+    profiles: ["runner"]
     restart: unless-stopped
     depends_on:
       gitea:
@@ -60,7 +64,11 @@ services:
       # Docker socket lets the runner build and push images without DinD
       - /var/run/docker.sock:/var/run/docker.sock
     healthcheck:
-      test: [ "CMD-SHELL", "test -f /runner/.runner && pgrep -f Runner.Listener >/dev/null" ]
+      test:
+        [
+          "CMD-SHELL",
+          "test -f /runner/.runner && pgrep -f Runner.Listener >/dev/null",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
