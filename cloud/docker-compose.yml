@@ -32,10 +32,17 @@ services:
     image: ghcr.io/immich-app/immich-machine-learning:release
     container_name: immich-machine-learning
     restart: unless-stopped
+    environment:
+      - IMMICH_HOST=0.0.0.0
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/model-cache:/cache
     healthcheck:
-      test: ["CMD-SHELL", "python3 -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:3003/ping\")'"]
+      test:
+        [
+          "CMD-SHELL",
+          "python3 -c 'import urllib.request;
+            urllib.request.urlopen(\"http://127.0.0.1:3003/ping\")'",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -49,7 +56,7 @@ services:
     restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping" ]
+      test: ["CMD-SHELL", "redis-cli -a ${REDIS_PASSWORD} ping"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -69,7 +76,7 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/db:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U immich -d immich" ]
+      test: ["CMD-SHELL", "pg_isready -U immich -d immich"]
       interval: 30s
       timeout: 5s
       retries: 5
@@ -108,7 +115,7 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud:/var/www/html
     healthcheck:
-      test: [ "CMD-SHELL", "php occ status >/dev/null 2>&1" ]
+      test: ["CMD-SHELL", "php occ status >/dev/null 2>&1"]
       interval: 30s
       timeout: 15s
       retries: 5
@@ -129,7 +136,7 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud-db:/var/lib/mysql
     healthcheck:
-      test: [ "CMD-SHELL", "healthcheck.sh --connect --innodb_initialized" ]
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
       interval: 30s
       timeout: 5s
       retries: 5
