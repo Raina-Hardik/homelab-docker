@@ -4,6 +4,9 @@ services:
     image: ghcr.io/immich-app/immich-server:release
     container_name: immich-server
     restart: unless-stopped
+    extends:
+      file: hwaccel.transcoding.yml
+      service: quicksync
     depends_on:
       immich-db:
         condition: service_healthy
@@ -29,8 +32,11 @@ services:
       - homelab
 
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:release
+    image: ghcr.io/immich-app/immich-machine-learning:release-openvino
     container_name: immich-machine-learning
+    extends:
+      file: hwaccel.ml.yml
+      service: openvino
     restart: unless-stopped
     environment:
       - IMMICH_HOST=0.0.0.0
