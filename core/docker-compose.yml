@@ -16,7 +16,7 @@ services:
     environment:
       - TZ=${TZ}
     healthcheck:
-      test: [ "CMD-SHELL", "ps -ef | grep -q '[A]dGuardHome'" ]
+      test: ["CMD-SHELL", "ps -ef | grep -q '[A]dGuardHome'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -49,7 +49,7 @@ services:
       adguard:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile" ]
+      test: ["CMD", "caddy", "validate", "--config", "/etc/caddy/Caddyfile"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -70,7 +70,12 @@ services:
       - TZ=${TZ}
       - HOMEPAGE_ALLOWED_HOSTS=home.${TS_DOMAIN}
     healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/api/healthcheck || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "wget -q -O /dev/null http://127.0.0.1:3000/api/healthcheck || exit
+            1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3

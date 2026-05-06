@@ -1,15 +1,12 @@
-# Homelab Caddyfile
+# Homelab Caddyfile#
+# TLS strategy: Tailscale-issued certificates via caddy-tailscale (tsnet).
+# Each service registers as its own Tailscale node and gets a valid HTTPS cert
+# automatically. No manual cert management or trust store required on Tailscale
+# devices.
 #
-# All site addresses use {$TS_DOMAIN} which Caddy expands from the TS_DOMAIN
-# environment variable at startup. Set TS_DOMAIN in your .env file.
-#
-# TLS strategy: "tls internal" — Caddy acts as its own CA and issues self-signed certs.
-# This works great for Tailscale-only access. To trust the cert on your devices, export
-# the Caddy root CA from /data/caddy/pki/authorities/local/root.crt and add it to your
-# OS/browser trust store.
-#
-# If you have a real public domain with DNS pointing to your server, replace
-# "tls internal" with "tls {$ACME_EMAIL}" to use Let's Encrypt.
+# TS_DOMAIN is set in .env (e.g. magic-dns.ts.net).
+# TS_AUTHKEY must be a reusable pre-authorized auth key with tag:homelab.
+
 {
 	email {$ACME_EMAIL}
 
