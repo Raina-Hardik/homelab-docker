@@ -70,6 +70,7 @@ _mkdirs:
         {{host_mount_root}}/authentik/media \
         {{host_mount_root}}/authentik/certs \
         {{host_mount_root}}/authentik/templates \
+        {{host_mount_root}}/zerobyte \
         {{host_mount_root}}/vaultwarden \
         {{host_mount_root}}/n8n
     @echo "Host directories ready under {{host_mount_root}}/"
@@ -77,11 +78,11 @@ _mkdirs:
 # ── Full stack (excludes extras) ──────────────────────────────────────────────
 
 # Bring up all stacks except extras
-up: up-core up-media up-cloud up-dev up-obs up-auth
+up: up-core up-media up-cloud up-backup up-dev up-obs up-auth
     @echo "All stacks up."
 
 # Bring down all stacks except extras (reverse order to avoid dangling deps)
-down: down-auth down-obs down-dev down-cloud down-media down-core
+down: down-auth down-obs down-dev down-backup down-cloud down-media down-core
     @echo "All stacks down."
 
 # ── Core ──────────────────────────────────────────────────────────────────────
@@ -116,6 +117,17 @@ down-cloud:
 
 logs-cloud:
     docker compose -f cloud/docker-compose.yml logs -f
+
+# ── Backup ────────────────────────────────────────────────────────────────────
+
+up-backup:
+    docker compose -f backup/docker-compose.yml up -d
+
+down-backup:
+    docker compose -f backup/docker-compose.yml down
+
+logs-backup:
+    docker compose -f backup/docker-compose.yml logs -f
 
 # ── Dev ───────────────────────────────────────────────────────────────────────
 
@@ -183,6 +195,7 @@ pull:
     docker compose -f core/docker-compose.yml pull
     docker compose -f media/docker-compose.yml pull
     docker compose -f cloud/docker-compose.yml pull
+    docker compose -f backup/docker-compose.yml pull
     docker compose -f dev/docker-compose.yml pull
     docker compose -f obs/docker-compose.yml pull
     docker compose -f auth/docker-compose.yml pull

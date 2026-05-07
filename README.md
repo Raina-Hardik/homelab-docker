@@ -28,6 +28,9 @@ This document describes the current running architecture and how to operate it. 
 - Nextcloud
 - Nextcloud MariaDB
 
+### Backup
+- Zerobyte (restic control plane)
+
 ### Dev
 - Forgejo (running in service/container `gitea`)
 - GitHub Actions self-hosted runner (profile-based, opt-in)
@@ -50,6 +53,8 @@ This document describes the current running architecture and how to operate it. 
 ```text
 .
 |-- auth/
+|   `-- docker-compose.yml
+|-- backup/
 |   `-- docker-compose.yml
 |-- cloud/
 |   `-- docker-compose.yml
@@ -115,6 +120,7 @@ just up
 just up-core      && just down-core
 just up-media     && just down-media
 just up-cloud     && just down-cloud
+just up-backup    && just down-backup
 just up-dev       && just down-dev
 just up-obs       && just down-obs
 just up-auth      && just down-auth
@@ -124,6 +130,7 @@ just up-extras    && just down-extras
 just logs-core
 just logs-media
 just logs-cloud
+just logs-backup
 just logs-dev
 just logs-obs
 just logs-auth
@@ -158,6 +165,7 @@ Common endpoints:
 - `https://qbit.<TS_DOMAIN>`
 - `https://immich.<TS_DOMAIN>`
 - `https://nextcloud.<TS_DOMAIN>`
+- `https://backup.<TS_DOMAIN>`
 - `https://gitea.<TS_DOMAIN>`
 - `https://beszel.<TS_DOMAIN>`
 - `https://dozzle.<TS_DOMAIN>`
@@ -191,6 +199,7 @@ Use `.env.example` as the source of truth. Important groups:
 - Core/Tailscale/Caddy: `TS_DOMAIN`, `TS_AUTHKEY`, `TS_TAG`, `ACME_EMAIL`, `LOCAL_DOMAIN`
 - Media VPN: `VPN_*`, `OPENVPN_USER`, `OPENVPN_PASSWORD`
 - Cloud: `IMMICH_DB_PASSWORD`, `REDIS_PASSWORD`, `NEXTCLOUD_*`
+- Backup: `ZEROBYTE_APP_SECRET`
 - Obs: `BESZEL_KEY`
 - Auth: `ENCRYPTION_KEY`
 - Runner: `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO`, `GITHUB_RUNNER_NAME`

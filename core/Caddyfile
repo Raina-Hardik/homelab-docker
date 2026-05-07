@@ -109,6 +109,14 @@ nextcloud.{$TS_DOMAIN} {
 	import common_proxy nextcloud:80
 }
 
+# ── Backup ────────────────────────────────────────────────────────────────────
+
+backup.{$TS_DOMAIN} {
+	bind tailscale/backup
+	import common
+	import common_proxy zerobyte:4096
+}
+
 # ── Dev ───────────────────────────────────────────────────────────────────────
 
 gitea.{$TS_DOMAIN} {

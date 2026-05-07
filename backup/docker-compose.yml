@@ -1,0 +1,36 @@
+services:
+  # ── Zerobyte ────────────────────────────────────────────────────────────────
+  # Restic-based backup control plane. Configure repositories, schedules,
+  # and retention through the web UI.
+  #
+  # For Backblaze B2, add a repository in Zerobyte using the S3-compatible
+  # endpoint format: https://s3.<region>.backblazeb2.com
+  zerobyte:
+    image: ghcr.io/nicotsx/zerobyte:latest
+    container_name: zerobyte
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - BASE_URL=https://backup.${TS_DOMAIN}
+      - APP_SECRET=${ZEROBYTE_APP_SECRET}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/zerobyte:/var/lib/zerobyte
+      # Backup sources are mounted read-only for backup-only workflows.
+      # Switch to rw if you plan to restore directly to source paths.
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/upload:/backup/immich/upload:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/db-dumps:/backup/immich/db-dumps:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud:/backup/nextcloud:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud-db:/backup/nextcloud-db:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4096 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
