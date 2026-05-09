@@ -3,8 +3,6 @@ services:
     image: ghcr.io/pocket-id/pocket-id:v2
     container_name: pocketid
     restart: unless-stopped
-    ports:
-      - 1411:1411
     environment:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - APP_URL=https://pocketid.${TS_DOMAIN}

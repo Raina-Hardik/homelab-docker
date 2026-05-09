@@ -12,8 +12,6 @@ services:
     # Allows the hub to reach the agent running on the host network at port 45876
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports:
-      - "8090:8090"
     healthcheck:
       test: ['CMD', '/beszel', 'health', '--url', 'http://localhost:8090']
       interval: 30s

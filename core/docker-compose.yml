@@ -9,10 +9,6 @@ services:
     ports:
       - "${ADGUARD_DNS_PORT_TCP:-53}:53/tcp"
       - "${ADGUARD_DNS_PORT_UDP:-53}:53/udp"
-      # Initial setup UI — accessible at http://<host-ip>:3000 before Caddy is configured.
-      # After first-run setup, AdGuard serves its UI on the port you configure (default 80 inside
-      # container). Remove this host-port binding once Caddy is routing to it.
-      - "3000:3000/tcp"
     environment:
       - TZ=${TZ}
     healthcheck:
