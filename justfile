@@ -50,11 +50,15 @@ _mkdirs:
         {{host_mount_root}}/downloads \
         {{host_mount_root}}/media/tv \
         {{host_mount_root}}/media/movies \
+        {{host_mount_root}}/media/music \
         {{host_mount_root}}/jellyfin \
         {{host_mount_root}}/seanime \
         {{host_mount_root}}/sonarr \
         {{host_mount_root}}/radarr \
+        {{host_mount_root}}/lidarr \
         {{host_mount_root}}/prowlarr \
+        {{host_mount_root}}/navidrome \
+        {{host_mount_root}}/feishin \
         {{host_mount_root}}/immich/upload \
         {{host_mount_root}}/immich/model-cache \
         {{host_mount_root}}/immich/db \
