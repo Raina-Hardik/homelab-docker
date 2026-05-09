@@ -12,13 +12,16 @@ This document describes the current running architecture and how to operate it. 
 - Homepage dashboard
 
 ### Media
-- Jellyfin
-- Seanime (hardware-accelerated image)
-- Sonarr
-- Radarr
-- Prowlarr
-- qBittorrent (traffic forced through Gluetun)
+- Jellyfin (media server)
+- Seanime (hardware-accelerated anime client/server)
+- Sonarr (TV show automation)
+- Radarr (movie automation)
+- Prowlarr (indexer aggregator)
+- qBittorrent (torrent client, traffic forced through Gluetun)
 - Gluetun (VPN tunnel)
+- Lidarr (music automation)
+- Navidrome (music server)
+- Feishin (music player UI for Navidrome)
 
 ### Cloud
 - Immich server
@@ -161,8 +164,11 @@ Common endpoints:
 - `https://anime.<TS_DOMAIN>`
 - `https://sonarr.<TS_DOMAIN>`
 - `https://radarr.<TS_DOMAIN>`
+- `https://lidarr.<TS_DOMAIN>`
 - `https://prowlarr.<TS_DOMAIN>`
 - `https://qbit.<TS_DOMAIN>`
+- `https://navidrome.<TS_DOMAIN>`
+- `https://feishin.<TS_DOMAIN>`
 - `https://immich.<TS_DOMAIN>`
 - `https://nextcloud.<TS_DOMAIN>`
 - `https://backup.<TS_DOMAIN>`
@@ -179,10 +185,14 @@ Extras routes are defined but commented in `core/Caddyfile`:
 ## Networking Model
 
 - All compose stacks use the shared external Docker network: `homelab`
+- **Port binding strategy**: Web UIs are NOT exposed to the host. All services are accessed through Caddy reverse proxy via Tailscale HTTPS.
+  - Exception: `DNS` (AdGuard on 53/tcp+udp) — system-level DNS requirement
+  - Exception: Torrent protocol ports (Gluetun on 6881/tcp+udp) — required for DHT peer connectivity
+  - Exception: Forgejo SSH (host `2222`) — optional, can be replaced with Tailscale SSH
 - qBittorrent uses `network_mode: service:gluetun` (no independent network)
 - Prowlarr is also routed through Gluetun
 - Beszel agent runs on host networking (`0.0.0.0:45876`)
-- Forgejo SSH is published on host `2222` (`host:2222 -> container:22`)
+- Beszel hub is accessed via Caddy (`beszel.<TS_DOMAIN>`)
 
 ## Storage Model
 
@@ -209,10 +219,10 @@ Use `.env.example` as the source of truth. Important groups:
 
 Some services need UI-driven setup after containers are healthy:
 
-- AdGuard Home: complete first-run setup (container exposes `3000` for bootstrap)
-- Beszel: add system in Hub UI and set `BESZEL_KEY`, then rerun `just up-obs`
-- Pocket ID: configure providers/apps/policies in UI
-- Uptime Kuma: create monitors in UI
+- AdGuard Home: complete first-run setup via `https://adguard.<TS_DOMAIN>` (Caddy routing)
+- Beszel: add system in Hub UI at `https://beszel.<TS_DOMAIN>` and set `BESZEL_KEY`, then rerun `just up-obs`
+- Pocket ID: configure providers/apps/policies via `https://pocketid.<TS_DOMAIN>`
+- Uptime Kuma: create monitors in UI at `https://uptime.<TS_DOMAIN>`
 - Runner: generate a fresh GitHub runner registration token, set env vars, run `just up-runner`
 
 ## Notes
@@ -220,4 +230,5 @@ Some services need UI-driven setup after containers are healthy:
 - Homepage host allow-list is set to `home.<TS_DOMAIN>`
 - Seanime config is tracked in `media/seanime.config.toml` and mounted into container
 - Seanime tracked config currently includes default password `admin`; change it for real deployments
+- All service UIs are accessed via Tailscale subdomains. Caddy handles reverse proxy routing with automatic HTTPS via Tailscale certificates.
 - Healthchecks are defined across all stacks and used by `depends_on: condition: service_healthy` where needed
