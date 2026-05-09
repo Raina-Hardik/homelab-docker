@@ -62,6 +62,18 @@ anime.{$TS_DOMAIN} {
 	import common_proxy seanime:43211
 }
 
+navidrome.{$TS_DOMAIN} {
+	bind tailscale/navidrome
+	import common
+	import common_proxy navidrome:4533
+}
+
+feishin.{$TS_DOMAIN} {
+	bind tailscale/feishin
+	import common
+	import common_proxy feishin:9180
+}
+
 sonarr.{$TS_DOMAIN} {
 	bind tailscale/sonarr
 	import common
@@ -72,6 +84,12 @@ radarr.{$TS_DOMAIN} {
 	bind tailscale/radarr
 	import common
 	import common_proxy radarr:7878
+}
+
+lidarr.{$TS_DOMAIN} {
+	bind tailscale/lidarr
+	import common
+	import common_proxy lidarr:8686
 }
 
 prowlarr.{$TS_DOMAIN} {
