@@ -24,6 +24,7 @@ This document describes the current running architecture and how to operate it. 
 - Feishin (music player UI for Navidrome)
 
 ### Cloud
+- AFFiNE (documentation/workspace)
 - Immich server
 - Immich machine learning
 - Immich PostgreSQL (pgvecto-rs)
@@ -170,6 +171,7 @@ Common endpoints:
 - `https://navidrome.<TS_DOMAIN>`
 - `https://feishin.<TS_DOMAIN>`
 - `https://immich.<TS_DOMAIN>`
+- `https://affine.<TS_DOMAIN>`
 - `https://nextcloud.<TS_DOMAIN>`
 - `https://backup.<TS_DOMAIN>`
 - `https://gitea.<TS_DOMAIN>`

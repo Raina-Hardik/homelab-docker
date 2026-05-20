@@ -22,6 +22,9 @@ services:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/immich/db-dumps:/backup/immich/db-dumps:ro
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud:/backup/nextcloud:ro
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/nextcloud-db:/backup/nextcloud-db:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/storage:/backup/affine/storage:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/config:/backup/affine/config:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/postgres:/backup/affine/postgres:ro
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4096 || exit 1"]
       interval: 30s
