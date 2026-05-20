@@ -230,8 +230,8 @@ services:
     container_name: feishin
     restart: unless-stopped
     environment:
+      - SERVER_URL=https://navidrome.${TS_DOMAIN}
       - SERVER_TYPE=navidrome
-      - SERVER_URL=http://navidrome:4533
       - SERVER_NAME=navidrome
       - SERVER_LOCK=true
       - ANALYTICS_DISABLED=true
