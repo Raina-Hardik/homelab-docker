@@ -62,6 +62,9 @@ _mkdirs:
         {{host_mount_root}}/immich/upload \
         {{host_mount_root}}/immich/model-cache \
         {{host_mount_root}}/immich/db \
+        {{host_mount_root}}/affine/storage \
+        {{host_mount_root}}/affine/config \
+        {{host_mount_root}}/affine/postgres \
         {{host_mount_root}}/nextcloud \
         {{host_mount_root}}/nextcloud-db \
         {{host_mount_root}}/gitea \
@@ -121,6 +124,18 @@ down-cloud:
 
 logs-cloud:
     docker compose -f cloud/docker-compose.yml logs -f
+
+# ── AFFiNE (cloud subset) ─────────────────────────────────────────────────────
+
+up-affine:
+    docker compose -f cloud/docker-compose.yml up -d affine-postgres affine-redis affine-migration affine
+
+down-affine:
+    docker compose -f cloud/docker-compose.yml stop affine affine-migration affine-postgres affine-redis
+    docker compose -f cloud/docker-compose.yml rm -f affine affine-migration affine-postgres affine-redis
+
+logs-affine:
+    docker compose -f cloud/docker-compose.yml logs -f affine-postgres affine-redis affine-migration affine
 
 # ── Backup ────────────────────────────────────────────────────────────────────
 

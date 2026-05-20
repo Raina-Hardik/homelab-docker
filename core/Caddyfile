@@ -113,6 +113,12 @@ qbit.{$TS_DOMAIN} {
 
 # ── Cloud ─────────────────────────────────────────────────────────────────────
 
+affine.{$TS_DOMAIN} {
+	bind tailscale/affine
+	import common
+	import common_proxy affine:3010
+}
+
 immich.{$TS_DOMAIN} {
 	bind tailscale/immich
 	import common
