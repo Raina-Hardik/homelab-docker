@@ -1,4 +1,97 @@
 services:
+  # ── AFFiNE ───────────────────────────────────────────────────────────────────
+  affine-migration:
+    image: ghcr.io/toeverything/affine:${AFFINE_REVISION:-stable}
+    container_name: affine-migration
+    restart: "no"
+    command: ["sh", "-c", "node ./scripts/self-host-predeploy.js"]
+    depends_on:
+      affine-postgres:
+        condition: service_healthy
+      affine-redis:
+        condition: service_healthy
+    environment:
+      - TZ=${TZ}
+      - REDIS_SERVER_HOST=affine-redis
+      - DATABASE_URL=postgresql://${AFFINE_DB_USERNAME:-affine}:${AFFINE_DB_PASSWORD}@affine-postgres:5432/${AFFINE_DB_DATABASE:-affine}
+      - AFFINE_SERVER_HTTPS=true
+      - AFFINE_SERVER_HOST=affine.${TS_DOMAIN}
+      - AFFINE_SERVER_EXTERNAL_URL=https://affine.${TS_DOMAIN}
+      - AFFINE_SERVER_PORT=3010
+      - PORT=3010
+      - AFFINE_INDEXER_ENABLED=false
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/storage:/root/.affine/storage
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/config:/root/.affine/config
+    networks:
+      - homelab
+
+  affine:
+    image: ghcr.io/toeverything/affine:${AFFINE_REVISION:-stable}
+    container_name: affine
+    restart: unless-stopped
+    depends_on:
+      affine-migration:
+        condition: service_completed_successfully
+      affine-postgres:
+        condition: service_healthy
+      affine-redis:
+        condition: service_healthy
+    environment:
+      - TZ=${TZ}
+      - REDIS_SERVER_HOST=affine-redis
+      - DATABASE_URL=postgresql://${AFFINE_DB_USERNAME:-affine}:${AFFINE_DB_PASSWORD}@affine-postgres:5432/${AFFINE_DB_DATABASE:-affine}
+      - AFFINE_SERVER_HTTPS=true
+      - AFFINE_SERVER_HOST=affine.${TS_DOMAIN}
+      - AFFINE_SERVER_EXTERNAL_URL=https://affine.${TS_DOMAIN}
+      - AFFINE_SERVER_PORT=3010
+      - PORT=3010
+      - AFFINE_INDEXER_ENABLED=false
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/storage:/root/.affine/storage
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/config:/root/.affine/config
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3010').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+    networks:
+      - homelab
+
+  affine-redis:
+    image: redis:7-alpine
+    container_name: affine-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - homelab
+
+  affine-postgres:
+    image: pgvector/pgvector:pg16
+    container_name: affine-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${AFFINE_DB_USERNAME:-affine}
+      - POSTGRES_PASSWORD=${AFFINE_DB_PASSWORD}
+      - POSTGRES_DB=${AFFINE_DB_DATABASE:-affine}
+      - POSTGRES_INITDB_ARGS=--data-checksums
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${AFFINE_DB_USERNAME:-affine} -d ${AFFINE_DB_DATABASE:-affine}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - homelab
+
   # ── Immich ────────────────────────────────────────────────────────────────────
   immich-server:
     image: ghcr.io/immich-app/immich-server:release
