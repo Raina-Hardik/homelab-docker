@@ -11,15 +11,17 @@ This document describes the current running architecture and how to operate it. 
 - Caddy with Tailscale integration (reverse proxy + service-bound HTTPS certs)
 - Homepage dashboard
 
+### ARR
+- Gluetun (VPN tunnel)
+- qBittorrent (torrent client, traffic forced through Gluetun)
+- Prowlarr (indexer aggregator)
+- Sonarr (TV show automation)
+- Radarr (movie automation)
+- Lidarr (music automation)
+
 ### Media
 - Jellyfin (media server)
 - Seanime (hardware-accelerated anime client/server)
-- Sonarr (TV show automation)
-- Radarr (movie automation)
-- Prowlarr (indexer aggregator)
-- qBittorrent (torrent client, traffic forced through Gluetun)
-- Gluetun (VPN tunnel)
-- Lidarr (music automation)
 - Navidrome (music server)
 - Feishin (music player UI for Navidrome)
 
@@ -59,6 +61,8 @@ This document describes the current running architecture and how to operate it. 
 |-- auth/
 |   `-- docker-compose.yml
 |-- backup/
+|   `-- docker-compose.yml
+|-- arr/
 |   `-- docker-compose.yml
 |-- cloud/
 |   `-- docker-compose.yml
@@ -122,6 +126,7 @@ just up
 ```bash
 # Per-stack lifecycle
 just up-core      && just down-core
+just up-arr       && just down-arr
 just up-media     && just down-media
 just up-cloud     && just down-cloud
 just up-backup    && just down-backup
@@ -132,6 +137,7 @@ just up-extras    && just down-extras
 
 # Logs
 just logs-core
+just logs-arr
 just logs-media
 just logs-cloud
 just logs-backup
@@ -161,13 +167,13 @@ Caddy routes services on Tailscale subdomains under `TS_DOMAIN`.
 Common endpoints:
 - `https://home.<TS_DOMAIN>` (Homepage)
 - `https://adguard.<TS_DOMAIN>`
-- `https://jellyfin.<TS_DOMAIN>`
-- `https://anime.<TS_DOMAIN>`
+- `https://qbit.<TS_DOMAIN>`
+- `https://prowlarr.<TS_DOMAIN>`
 - `https://sonarr.<TS_DOMAIN>`
 - `https://radarr.<TS_DOMAIN>`
 - `https://lidarr.<TS_DOMAIN>`
-- `https://prowlarr.<TS_DOMAIN>`
-- `https://qbit.<TS_DOMAIN>`
+- `https://jellyfin.<TS_DOMAIN>`
+- `https://anime.<TS_DOMAIN>`
 - `https://navidrome.<TS_DOMAIN>`
 - `https://feishin.<TS_DOMAIN>`
 - `https://immich.<TS_DOMAIN>`
@@ -209,7 +215,7 @@ Use `.env.example` as the source of truth. Important groups:
 
 - System: `TZ`, `PUID`, `PGID`, `HOST_MOUNT_ROOT`
 - Core/Tailscale/Caddy: `TS_DOMAIN`, `TS_AUTHKEY`, `TS_TAG`, `ACME_EMAIL`, `LOCAL_DOMAIN`
-- Media VPN: `VPN_*`, `OPENVPN_USER`, `OPENVPN_PASSWORD`
+- ARR VPN: `VPN_*`, `OPENVPN_USER`, `OPENVPN_PASSWORD`
 - Cloud: `IMMICH_DB_PASSWORD`, `REDIS_PASSWORD`, `NEXTCLOUD_*`
 - Backup: `ZEROBYTE_APP_SECRET`
 - Obs: `BESZEL_KEY`
