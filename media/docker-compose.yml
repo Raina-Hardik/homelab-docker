@@ -101,6 +101,9 @@ services:
     restart: unless-stopped
     devices:
       - /dev/dri:/dev/dri
+    group_add:
+      - ${RENDER_GID:-39}
+      - ${VIDEO_GID:-105}
     environment:
       - TZ=${TZ}
     volumes:
