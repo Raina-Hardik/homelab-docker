@@ -87,11 +87,11 @@ _mkdirs:
 # ── Full stack (excludes extras) ──────────────────────────────────────────────
 
 # Bring up all stacks except extras
-up: up-core up-media up-cloud up-backup up-dev up-obs up-auth
+up: up-core up-arr up-media up-cloud up-backup up-dev up-obs up-auth
     @echo "All stacks up."
 
 # Bring down all stacks except extras (reverse order to avoid dangling deps)
-down: down-auth down-obs down-dev down-backup down-cloud down-media down-core
+down: down-auth down-obs down-dev down-backup down-cloud down-media down-arr down-core
     @echo "All stacks down."
 
 # ── Core ──────────────────────────────────────────────────────────────────────
@@ -104,6 +104,17 @@ down-core:
 
 logs-core:
     docker compose -f core/docker-compose.yml logs -f
+
+# ── ARR ───────────────────────────────────────────────────────────────────────
+
+up-arr:
+    docker compose -f arr/docker-compose.yml up -d
+
+down-arr:
+    docker compose -f arr/docker-compose.yml down
+
+logs-arr:
+    docker compose -f arr/docker-compose.yml logs -f
 
 # ── Media ─────────────────────────────────────────────────────────────────────
 
@@ -214,6 +225,7 @@ ps:
 # Pull latest images for all stacks (extras included)
 pull:
     docker compose -f core/docker-compose.yml pull
+    docker compose -f arr/docker-compose.yml pull
     docker compose -f media/docker-compose.yml pull
     docker compose -f cloud/docker-compose.yml pull
     docker compose -f backup/docker-compose.yml pull
