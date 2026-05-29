@@ -18,6 +18,7 @@ This document describes the current running architecture and how to operate it. 
 - Sonarr (TV show automation)
 - Radarr (movie automation)
 - Lidarr (music automation)
+- Tdarr (H.265/≤1080p re-encoder, Intel iGPU-accelerated via VA-API)
 
 ### Media
 - Jellyfin (media server)
@@ -91,7 +92,7 @@ This document describes the current running architecture and how to operate it. 
 - Linux host capabilities used by some services:
   - `/var/run/tailscale/tailscaled.sock` mounted into Caddy
   - `/dev/net/tun` for Gluetun
-  - `/dev/dri` for Jellyfin/Seanime hardware acceleration
+  - `/dev/dri` for Jellyfin/Seanime/Tdarr hardware acceleration (Intel iGPU / VA-API)
 
 ## First-Time Setup
 
@@ -172,6 +173,7 @@ Common endpoints:
 - `https://sonarr.<TS_DOMAIN>`
 - `https://radarr.<TS_DOMAIN>`
 - `https://lidarr.<TS_DOMAIN>`
+- `https://tdarr.<TS_DOMAIN>`
 - `https://jellyfin.<TS_DOMAIN>`
 - `https://anime.<TS_DOMAIN>`
 - `https://navidrome.<TS_DOMAIN>`
@@ -197,6 +199,7 @@ Extras routes are defined but commented in `core/Caddyfile`:
   - Exception: `DNS` (AdGuard on 53/tcp+udp) — system-level DNS requirement
   - Exception: Torrent protocol ports (Gluetun on 6881/tcp+udp) — required for DHT peer connectivity
   - Exception: Forgejo SSH (host `2222`) — optional, can be replaced with Tailscale SSH
+  - Exception: Tdarr server port (8266) — required for external node connectivity
 - qBittorrent uses `network_mode: service:gluetun` (no independent network)
 - Prowlarr is also routed through Gluetun
 - Beszel agent runs on host networking (`0.0.0.0:45876`)
@@ -233,6 +236,7 @@ Some services need UI-driven setup after containers are healthy:
 - Nextcloud OnlyOffice: install/enable the OnlyOffice app in Nextcloud, set the document server URL to `http://onlyoffice/`, and use `ONLYOFFICE_JWT_SECRET` with header `Authorization`
 - Pocket ID: configure providers/apps/policies via `https://pocketid.<TS_DOMAIN>`
 - Uptime Kuma: create monitors in UI at `https://uptime.<TS_DOMAIN>`
+- Tdarr: create a Flow at `https://tdarr.<TS_DOMAIN>` that (1) transcodes to H.265 using the `hevc_vaapi` encoder and (2) scales to ≤1080p. Add your media libraries pointing to `/media/tv`, `/media/movies`, `/media/anime`, `/media/music`.
 - Runner: generate a fresh GitHub runner registration token, set env vars, run `just up-runner`
 
 ## Notes

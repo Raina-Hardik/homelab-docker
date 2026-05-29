@@ -144,6 +144,56 @@ services:
     networks:
       - homelab
 
+  # ── Transcoding / Re-encoding ─────────────────────────────────────────────────
+  # Tdarr watches your libraries and re-encodes content to H.265 at ≤1080p.
+  # internalNode=true runs the worker node inside the same container as the server.
+  # GPU transcoding uses Intel Quick Sync via /dev/dri (VA-API), consistent with
+  # Jellyfin and Seanime in the media stack.
+  tdarr:
+    image: ghcr.io/haveagitgat/tdarr:latest
+    container_name: tdarr
+    restart: unless-stopped
+    # Intel iGPU passthrough (VA-API / Quick Sync)
+    devices:
+      - /dev/dri:/dev/dri
+    group_add:
+      - ${RENDER_GID:-39}
+      - ${VIDEO_GID:-105}
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK_SET=002
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - inContainer=true
+      - ffmpegVersion=7
+      - nodeName=InternalNode
+      - openBrowser=false
+      - maxLogSizeMB=10
+      - cronPluginUpdate=
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/tdarr/server:/app/server
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/tdarr/configs:/app/configs
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/tdarr/logs:/app/logs
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/tdarr/cache:/temp
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/tv:/media/tv
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/movies:/media/movies
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/music:/media/music
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/anime:/media/anime
+    ports:
+      - "8266:8266" # Server / node comms (required for external nodes)
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8265 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - homelab
+
 networks:
   homelab:
     external: true
