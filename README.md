@@ -234,6 +234,7 @@ Use `.env.example` as the source of truth. Important groups:
 - Auth: `ENCRYPTION_KEY`
 - Runner: `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO`, `GITHUB_RUNNER_NAME`
 - Extras: `VAULTWARDEN_ADMIN_TOKEN`, `N8N_BASIC_AUTH_*`, `N8N_ENCRYPTION_KEY`
+- Games: `MC_MOTD`, `MC_LEVEL`
 
 ## Post-Boot Actions
 

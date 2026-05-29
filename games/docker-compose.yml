@@ -12,33 +12,33 @@ services:
     tty: true
     stdin_open: true
     environment:
-      EULA: "TRUE"
-      TYPE: "PAPER"
-      MEMORY: "8192M"                      # homelab idles at ~13% of 32 GB
-      UID: ${PUID}
-      GID: ${PGID}
-      TZ: ${TZ}
+      - EULA=TRUE
+      - TYPE=PAPER
+      - MEMORY=8192M                       # homelab idles at ~13% of 32 GB
+      - UID=${PUID}
+      - GID=${PGID}
+      - TZ=${TZ}
       # Server identity
-      MOTD: "§dIl sempre mio, per sempre tuo §f| §aSurvival Server"
-      LEVEL: "Erste Welt"
-      MAX_PLAYERS: "4"
+      - MOTD=${MC_MOTD}
+      - LEVEL=${MC_LEVEL}
+      - MAX_PLAYERS=4
       # Performance
-      USE_MEOWICE_FLAGS: "true"
-      VIEW_DISTANCE: "12"                  # balanced for CPU
-      SIMULATION_DISTANCE: "8"             # always ≤ view distance
+      - USE_MEOWICE_FLAGS=true
+      - VIEW_DISTANCE=12                   # balanced for CPU
+      - SIMULATION_DISTANCE=8              # always ≤ view distance
       # Features
-      ENABLE_COMMAND_BLOCK: "true"
-      ALLOW_FLIGHT: "true"
-      ACCEPTS_TRANSFERS: "true"
-      ANNOUNCE_PLAYER_ACHIEVEMENTS: "true"
+      - ENABLE_COMMAND_BLOCK=true
+      - ALLOW_FLIGHT=true
+      - ACCEPTS_TRANSFERS=true
+      - ANNOUNCE_PLAYER_ACHIEVEMENTS=true
       # Logging
-      ENABLE_ROLLING_LOGS: "true"
-      LOG_TIMESTAMP: "true"
+      - ENABLE_ROLLING_LOGS=true
+      - LOG_TIMESTAMP=true
       # Autopause — idles JVM when no players are online
-      ENABLE_AUTOPAUSE: "TRUE"
-      AUTOPAUSE_TIMEOUT_EST: "300"         # pause after 5 min of no players
-      AUTOPAUSE_TIMEOUT_INIT: "600"        # 10 min grace on first startup
-      MANAGEMENT_SERVER_ENABLED: "false"
+      - ENABLE_AUTOPAUSE=TRUE
+      - AUTOPAUSE_TIMEOUT_EST=300          # pause after 5 min of no players
+      - AUTOPAUSE_TIMEOUT_INIT=600         # 10 min grace on first startup
+      - MANAGEMENT_SERVER_ENABLED=false
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/mc:/data
     ports:
