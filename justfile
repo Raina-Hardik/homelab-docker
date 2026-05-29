@@ -67,6 +67,8 @@ _mkdirs:
         {{host_mount_root}}/affine/postgres \
         {{host_mount_root}}/nextcloud \
         {{host_mount_root}}/nextcloud-db \
+        {{host_mount_root}}/onlyoffice/data \
+        {{host_mount_root}}/onlyoffice/logs \
         {{host_mount_root}}/gitea \
         {{host_mount_root}}/gh-runner/config \
         {{host_mount_root}}/gh-runner/work \

@@ -243,6 +243,23 @@ services:
     networks:
       - homelab
 
+  # ── ONLYOFFICE Docs ─────────────────────────────────────────────────────────
+  onlyoffice:
+    image: onlyoffice/documentserver:latest
+    container_name: onlyoffice
+    restart: unless-stopped
+    environment:
+      - TZ=${TZ}
+      - JWT_ENABLED=true
+      - JWT_SECRET=${ONLYOFFICE_JWT_SECRET}
+      - JWT_HEADER=${JWT_HEADER}
+      - ALLOW_PRIVATE_IP_ADDRESS=true
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/onlyoffice/data:/var/www/onlyoffice/Data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/onlyoffice/logs:/var/log/onlyoffice
+    networks:
+      - homelab
+
 networks:
   homelab:
     external: true

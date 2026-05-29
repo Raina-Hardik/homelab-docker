@@ -211,6 +211,7 @@ Use `.env.example` as the source of truth. Important groups:
 - Core/Tailscale/Caddy: `TS_DOMAIN`, `TS_AUTHKEY`, `TS_TAG`, `ACME_EMAIL`, `LOCAL_DOMAIN`
 - Media VPN: `VPN_*`, `OPENVPN_USER`, `OPENVPN_PASSWORD`
 - Cloud: `IMMICH_DB_PASSWORD`, `REDIS_PASSWORD`, `NEXTCLOUD_*`
+- Cloud: `ONLYOFFICE_JWT_SECRET`, `JWT_HEADER`
 - Backup: `ZEROBYTE_APP_SECRET`
 - Obs: `BESZEL_KEY`
 - Auth: `ENCRYPTION_KEY`
@@ -223,6 +224,7 @@ Some services need UI-driven setup after containers are healthy:
 
 - AdGuard Home: complete first-run setup via `https://adguard.<TS_DOMAIN>` (Caddy routing)
 - Beszel: add system in Hub UI at `https://beszel.<TS_DOMAIN>` and set `BESZEL_KEY`, then rerun `just up-obs`
+- Nextcloud OnlyOffice: install/enable the OnlyOffice app in Nextcloud, set the document server URL to `http://onlyoffice/`, and use `ONLYOFFICE_JWT_SECRET` with header `Authorization`
 - Pocket ID: configure providers/apps/policies via `https://pocketid.<TS_DOMAIN>`
 - Uptime Kuma: create monitors in UI at `https://uptime.<TS_DOMAIN>`
 - Runner: generate a fresh GitHub runner registration token, set env vars, run `just up-runner`
