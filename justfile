@@ -81,7 +81,11 @@ _mkdirs:
         {{host_mount_root}}/authentik/templates \
         {{host_mount_root}}/zerobyte \
         {{host_mount_root}}/vaultwarden \
-        {{host_mount_root}}/n8n
+        {{host_mount_root}}/n8n \
+        {{host_mount_root}}/tdarr/server \
+        {{host_mount_root}}/tdarr/configs \
+        {{host_mount_root}}/tdarr/logs \
+        {{host_mount_root}}/tdarr/cache
     @echo "Host directories ready under {{host_mount_root}}/"
 
 # ── Full stack (excludes extras) ──────────────────────────────────────────────

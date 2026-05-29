@@ -92,6 +92,12 @@ lidarr.{$TS_DOMAIN} {
 	import common_proxy lidarr:8686
 }
 
+tdarr.{$TS_DOMAIN} {
+	bind tailscale/tdarr
+	import common
+	import common_proxy tdarr:8265
+}
+
 prowlarr.{$TS_DOMAIN} {
 	bind tailscale/prowlarr
 	import common
