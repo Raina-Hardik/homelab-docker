@@ -248,6 +248,7 @@ pull:
     docker compose -f dev/docker-compose.yml pull
     docker compose -f obs/docker-compose.yml pull
     docker compose -f auth/docker-compose.yml pull
+    docker compose -f games/docker-compose.yml pull
     docker compose -f extras/docker-compose.yml pull
 
 # Restart a single service by name across all compose files
