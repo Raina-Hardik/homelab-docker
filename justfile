@@ -85,17 +85,18 @@ _mkdirs:
         {{host_mount_root}}/tdarr/server \
         {{host_mount_root}}/tdarr/configs \
         {{host_mount_root}}/tdarr/logs \
-        {{host_mount_root}}/tdarr/cache
+        {{host_mount_root}}/tdarr/cache \
+        {{host_mount_root}}/mc
     @echo "Host directories ready under {{host_mount_root}}/"
 
 # ── Full stack (excludes extras) ──────────────────────────────────────────────
 
 # Bring up all stacks except extras
-up: up-core up-arr up-media up-cloud up-backup up-dev up-obs up-auth
+up: up-core up-arr up-media up-cloud up-backup up-dev up-obs up-auth up-games
     @echo "All stacks up."
 
 # Bring down all stacks except extras (reverse order to avoid dangling deps)
-down: down-auth down-obs down-dev down-backup down-cloud down-media down-arr down-core
+down: down-games down-auth down-obs down-dev down-backup down-cloud down-media down-arr down-core
     @echo "All stacks down."
 
 # ── Core ──────────────────────────────────────────────────────────────────────
@@ -208,6 +209,17 @@ down-auth:
 
 logs-auth:
     docker compose -f auth/docker-compose.yml logs -f
+
+# ── Games ─────────────────────────────────────────────────────────────────────
+
+up-games:
+    docker compose -f games/docker-compose.yml up -d
+
+down-games:
+    docker compose -f games/docker-compose.yml down
+
+logs-games:
+    docker compose -f games/docker-compose.yml logs -f
 
 # ── Extras (opt-in) ───────────────────────────────────────────────────────────
 

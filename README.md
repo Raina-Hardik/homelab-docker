@@ -55,6 +55,9 @@ This document describes the current running architecture and how to operate it. 
 - Vaultwarden
 - n8n
 
+### Games
+- Minecraft PaperMC (2-player survival server, autopause when idle)
+
 ## Repository Layout
 
 ```text
@@ -73,6 +76,8 @@ This document describes the current running architecture and how to operate it. 
 |-- dev/
 |   `-- docker-compose.yml
 |-- extras/
+|   `-- docker-compose.yml
+|-- games/
 |   `-- docker-compose.yml
 |-- media/
 |   |-- docker-compose.yml
@@ -134,6 +139,7 @@ just up-backup    && just down-backup
 just up-dev       && just down-dev
 just up-obs       && just down-obs
 just up-auth      && just down-auth
+just up-games     && just down-games
 just up-extras    && just down-extras
 
 # Logs
@@ -145,6 +151,7 @@ just logs-backup
 just logs-dev
 just logs-obs
 just logs-auth
+just logs-games
 just logs-extras
 
 # Utilities
@@ -200,6 +207,7 @@ Extras routes are defined but commented in `core/Caddyfile`:
   - Exception: Torrent protocol ports (Gluetun on 6881/tcp+udp) — required for DHT peer connectivity
   - Exception: Forgejo SSH (host `2222`) — optional, can be replaced with Tailscale SSH
   - Exception: Tdarr server port (8266) — required for external node connectivity
+  - Exception: Minecraft (25565/tcp) — game protocol, direct TCP, no HTTP proxy
 - qBittorrent uses `network_mode: service:gluetun` (no independent network)
 - Prowlarr is also routed through Gluetun
 - Beszel agent runs on host networking (`0.0.0.0:45876`)
