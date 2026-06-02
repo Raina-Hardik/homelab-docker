@@ -15,6 +15,7 @@ This document describes the current running architecture and how to operate it. 
 - Gluetun (VPN tunnel)
 - qBittorrent (torrent client, traffic forced through Gluetun)
 - Prowlarr (indexer aggregator)
+- FlareSolverr (Cloudflare bypass proxy for Prowlarr indexers, internal only)
 - Sonarr (TV show automation)
 - Radarr (movie automation)
 - Lidarr (music automation)

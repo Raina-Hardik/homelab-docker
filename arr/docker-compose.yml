@@ -144,6 +144,28 @@ services:
     networks:
       - homelab
 
+  # ── Cloudflare Bypass ────────────────────────────────────────────────────────
+  # FlareSolverr proxies requests through a headless browser to bypass Cloudflare
+  # protection. Prowlarr uses it via Settings → Indexers → Add FlareSolverr proxy,
+  # pointing to http://flaresolverr:8191.
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=${TZ}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8191/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    networks:
+      - homelab
+
   # ── Transcoding / Re-encoding ─────────────────────────────────────────────────
   # Tdarr watches your libraries and re-encodes content to H.265 at ≤1080p.
   # internalNode=true runs the worker node inside the same container as the server.
