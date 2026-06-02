@@ -53,29 +53,19 @@ services:
     networks:
       - homelab
 
-  homepage:
-    image: ghcr.io/gethomepage/homepage:latest
-    container_name: homepage
+  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
     restart: unless-stopped
     depends_on:
       caddy:
         condition: service_healthy
     volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/homarr/appdata:/appdata
     environment:
       - TZ=${TZ}
-      - HOMEPAGE_ALLOWED_HOSTS=home.${TS_DOMAIN}
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget -q -O /dev/null http://127.0.0.1:3000/api/healthcheck || exit
-            1",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
+      - SECRET_ENCRYPTION_KEY=${HOMARR_SECRET_ENCRYPTION_KEY}
     networks:
       - homelab
 networks:

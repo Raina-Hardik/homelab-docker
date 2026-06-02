@@ -9,7 +9,7 @@ This document describes the current running architecture and how to operate it. 
 ### Core
 - AdGuard Home (DNS filtering)
 - Caddy with Tailscale integration (reverse proxy + service-bound HTTPS certs)
-- Homepage dashboard
+- Homarr dashboard
 
 ### ARR
 - Gluetun (VPN tunnel)
@@ -174,7 +174,7 @@ just logs-runner
 Caddy routes services on Tailscale subdomains under `TS_DOMAIN`.
 
 Common endpoints:
-- `https://home.<TS_DOMAIN>` (Homepage)
+- `https://home.<TS_DOMAIN>` (Homarr)
 - `https://adguard.<TS_DOMAIN>`
 - `https://qbit.<TS_DOMAIN>`
 - `https://prowlarr.<TS_DOMAIN>`

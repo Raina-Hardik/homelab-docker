@@ -45,7 +45,7 @@ adguard.{$TS_DOMAIN} {
 home.{$TS_DOMAIN} {
 	bind tailscale/home
 	import common
-	import common_proxy homepage:3000
+	import common_proxy homarr:7575
 }
 
 # ── Media ─────────────────────────────────────────────────────────────────────
