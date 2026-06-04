@@ -16,9 +16,12 @@ services:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/jellyfin:/config
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/tv:/data/tvshows
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/movies:/data/movies
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/anime:/data/movies/anime
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 9.9.9.9
     healthcheck:
       test: ["CMD-SHELL", "ps -ef | grep -q '[j]ellyfin'"]
       interval: 30s
