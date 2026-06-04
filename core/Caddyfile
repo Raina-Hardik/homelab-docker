@@ -39,7 +39,7 @@
 adguard.{$TS_DOMAIN} {
 	bind tailscale/adguard
 	import common
-	import common_proxy adguard:3000
+	import common_proxy adguard:80
 }
 
 home.{$TS_DOMAIN} {
@@ -137,6 +137,12 @@ nextcloud.{$TS_DOMAIN} {
 	redir /.well-known/carddav /remote.php/dav/ 301
 	redir /.well-known/caldav /remote.php/dav/ 301
 	import common_proxy nextcloud:80
+}
+
+office.{$TS_DOMAIN} {
+	bind tailscale/office
+	import common
+	import common_proxy onlyoffice:80
 }
 
 # ── Backup ────────────────────────────────────────────────────────────────────
