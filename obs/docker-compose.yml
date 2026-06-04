@@ -7,6 +7,8 @@ services:
     image: henrygd/beszel:latest
     container_name: beszel
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8090:8090"
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/beszel:/beszel_data
     # Allows the hub to reach the agent running on the host network at port 45876
@@ -38,7 +40,7 @@ services:
       # Leave blank on first boot, then populate after getting the key from the UI.
       - KEY=${BESZEL_KEY}
       - TOKEN=${BESZEL_KEY}
-      - HUB_URL=http://host.docker.internal:8090
+      - HUB_URL=http://127.0.0.1:8090
     healthcheck:
       test: ['CMD', '/agent', 'health']
       interval: 30s
