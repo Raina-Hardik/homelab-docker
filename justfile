@@ -55,7 +55,7 @@ _mkdirs:
         {{host_mount_root}}/seanime \
         {{host_mount_root}}/sonarr \
         {{host_mount_root}}/radarr \
-        {{host_mount_root}}/lidarr \
+        {{host_mount_root}}/music-grabber \
         {{host_mount_root}}/prowlarr \
         {{host_mount_root}}/navidrome \
         {{host_mount_root}}/feishin \

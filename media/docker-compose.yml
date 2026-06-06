@@ -104,6 +104,38 @@ services:
     depends_on:
       - navidrome
 
+  # ── Music Grabber ─────────────────────────────────────────────────────────────
+  # Fetches and processes music into the media library.
+  music-grabber:
+    image: g33kphr33k/musicgrabber:latest
+    container_name: music-grabber
+    restart: unless-stopped
+    shm_size: '2gb'
+    environment:
+      - TZ=${TZ}
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - MUSIC_DIR=/music
+      - DB_PATH=/data/music_grabber.db
+      - ENABLE_MUSICBRAINZ=true
+      - DEFAULT_CONVERT_TO_FLAC=true
+      - NAVIDROME_URL=http://navidrome:4533
+      - NAVIDROME_USER=admin
+      - NAVIDROME_PASS=admin
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/music:/music
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/music-grabber:/data
+    healthcheck:
+      test: ["CMD-SHELL", "python3 -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080')\" || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - homelab
+    depends_on:
+      - navidrome
+
 networks:
   homelab:
     external: true

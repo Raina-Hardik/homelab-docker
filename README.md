@@ -180,7 +180,7 @@ Common endpoints:
 - `https://prowlarr.<TS_DOMAIN>`
 - `https://sonarr.<TS_DOMAIN>`
 - `https://radarr.<TS_DOMAIN>`
-- `https://lidarr.<TS_DOMAIN>`
+- `https://music.<TS_DOMAIN>` (Music Grabber)
 - `https://tdarr.<TS_DOMAIN>`
 - `https://jellyfin.<TS_DOMAIN>`
 - `https://anime.<TS_DOMAIN>`

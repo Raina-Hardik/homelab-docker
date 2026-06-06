@@ -123,26 +123,6 @@ services:
       retries: 5
       start_period: 40s
 
-  lidarr:
-    image: lscr.io/linuxserver/lidarr:latest
-    container_name: lidarr
-    restart: unless-stopped
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/lidarr:/config
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/music:/music
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
-    healthcheck:
-      test: ["CMD-SHELL", "ps -ef | grep -q '[L]idarr'"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
-    networks:
-      - homelab
 
   # ── Cloudflare Bypass ────────────────────────────────────────────────────────
   # FlareSolverr proxies requests through a headless browser to bypass Cloudflare

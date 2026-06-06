@@ -86,10 +86,10 @@ radarr.{$TS_DOMAIN} {
 	import common_proxy radarr:7878
 }
 
-lidarr.{$TS_DOMAIN} {
-	bind tailscale/lidarr
+music.{$TS_DOMAIN} {
+	bind tailscale/music
 	import common
-	import common_proxy lidarr:8686
+	import common_proxy music-grabber:8080
 }
 
 tdarr.{$TS_DOMAIN} {
