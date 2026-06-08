@@ -1,4 +1,4 @@
-version = '3.8.3'
+version = '3.8.4'
 
 [cache]
 dir = '$SEANIME_DATA_DIR/cache'
@@ -28,6 +28,9 @@ password = 'admin'
 port = 43211
 trustedproxies = ['172.18.0.0/16']
 usebinarypath = true
+
+[torrent]
+dir = '$SEANIME_DATA_DIR/torrent'
 
 [web]
 assetdir = '$SEANIME_DATA_DIR/assets'
