@@ -1,4 +1,4 @@
-version = '3.8.4'
+version = '3.8.6'
 
 [cache]
 dir = '$SEANIME_DATA_DIR/cache'
