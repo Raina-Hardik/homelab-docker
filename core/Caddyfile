@@ -74,16 +74,10 @@ feishin.{$TS_DOMAIN} {
 	import common_proxy feishin:9180
 }
 
-sonarr.{$TS_DOMAIN} {
-	bind tailscale/sonarr
+seer.{$TS_DOMAIN} {
+	bind tailscale/seer
 	import common
-	import common_proxy sonarr:8989
-}
-
-radarr.{$TS_DOMAIN} {
-	bind tailscale/radarr
-	import common
-	import common_proxy radarr:7878
+	import common_proxy seerr:5055
 }
 
 music.{$TS_DOMAIN} {

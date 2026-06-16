@@ -124,6 +124,33 @@ services:
       start_period: 40s
 
 
+  # ── Media Request Manager ─────────────────────────────────────────────────────
+  # Seerr is the single entry point for media requests. Direct Tailscale routes
+  # for Sonarr and Radarr are removed from the Caddyfile — access only via Seerr.
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
+    container_name: seerr
+    user: root
+    restart: unless-stopped
+    environment:
+      - LOG_LEVEL=info
+      - TZ=${TZ}
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/seerr:/app/config
+    dns:
+      - 9.9.9.9      # Quad9
+      - 1.1.1.1      # Cloudflare
+      - 8.8.8.8      # Google
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5055/api/v1/settings/public || exit 1"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    networks:
+      - homelab
+
   # ── Cloudflare Bypass ────────────────────────────────────────────────────────
   # FlareSolverr proxies requests through a headless browser to bypass Cloudflare
   # protection. Prowlarr uses it via Settings → Indexers → Add FlareSolverr proxy,

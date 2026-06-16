@@ -56,6 +56,7 @@ _mkdirs:
         {{host_mount_root}}/sonarr \
         {{host_mount_root}}/radarr \
         {{host_mount_root}}/music-grabber \
+        {{host_mount_root}}/seerr \
         {{host_mount_root}}/prowlarr \
         {{host_mount_root}}/navidrome \
         {{host_mount_root}}/feishin \
@@ -87,6 +88,10 @@ _mkdirs:
         {{host_mount_root}}/tdarr/logs \
         {{host_mount_root}}/tdarr/cache \
         {{host_mount_root}}/mc
+    # On SELinux hosts (Fedora/RHEL), newly created dirs under a home directory
+    # inherit user_home_t which Docker containers cannot write to. Relabel to
+    # container_file_t so bind mounts work without :Z on every volume entry.
+    chcon -Rt container_file_t {{host_mount_root}} 2>/dev/null || true
     @echo "Host directories ready under {{host_mount_root}}/"
 
 # ── Full stack (excludes extras) ──────────────────────────────────────────────
