@@ -12,7 +12,7 @@
 #   just ps            — show all running containers
 #   just pull          — pull latest images for all stacks
 
-set dotenv-load := true
+set dotenv-load
 
 set shell := ["bash", "-c"]
 set windows-shell := ["pwsh.exe", "-NoProfile", "-Command"]
@@ -40,59 +40,59 @@ _network:
 
 _mkdirs:
     mkdir -p \
-        {{host_mount_root}}/homarr/appdata \
-        {{host_mount_root}}/adguard/work \
-        {{host_mount_root}}/adguard/conf \
-        {{host_mount_root}}/caddy/data \
-        {{host_mount_root}}/caddy/config \
-        {{host_mount_root}}/gluetun \
-        {{host_mount_root}}/qbittorrent \
-        {{host_mount_root}}/downloads \
-        {{host_mount_root}}/media/tv \
-        {{host_mount_root}}/media/movies \
-        {{host_mount_root}}/media/music \
-        {{host_mount_root}}/jellyfin \
-        {{host_mount_root}}/seanime \
-        {{host_mount_root}}/sonarr \
-        {{host_mount_root}}/radarr \
-        {{host_mount_root}}/music-grabber \
-        {{host_mount_root}}/seerr \
-        {{host_mount_root}}/prowlarr \
-        {{host_mount_root}}/navidrome \
-        {{host_mount_root}}/feishin \
-        {{host_mount_root}}/immich/upload \
-        {{host_mount_root}}/immich/model-cache \
-        {{host_mount_root}}/immich/db \
-        {{host_mount_root}}/affine/storage \
-        {{host_mount_root}}/affine/config \
-        {{host_mount_root}}/affine/postgres \
-        {{host_mount_root}}/nextcloud \
-        {{host_mount_root}}/nextcloud-db \
-        {{host_mount_root}}/onlyoffice/data \
-        {{host_mount_root}}/onlyoffice/logs \
-        {{host_mount_root}}/gitea \
-        {{host_mount_root}}/gh-runner/config \
-        {{host_mount_root}}/gh-runner/work \
-        {{host_mount_root}}/beszel \
-        {{host_mount_root}}/uptime-kuma \
-        {{host_mount_root}}/authentik/db \
-        {{host_mount_root}}/authentik/redis \
-        {{host_mount_root}}/authentik/media \
-        {{host_mount_root}}/authentik/certs \
-        {{host_mount_root}}/authentik/templates \
-        {{host_mount_root}}/zerobyte \
-        {{host_mount_root}}/vaultwarden \
-        {{host_mount_root}}/n8n \
-        {{host_mount_root}}/tdarr/server \
-        {{host_mount_root}}/tdarr/configs \
-        {{host_mount_root}}/tdarr/logs \
-        {{host_mount_root}}/tdarr/cache \
-        {{host_mount_root}}/mc
+        {{ host_mount_root }}/homarr/appdata \
+        {{ host_mount_root }}/adguard/work \
+        {{ host_mount_root }}/adguard/conf \
+        {{ host_mount_root }}/caddy/data \
+        {{ host_mount_root }}/caddy/config \
+        {{ host_mount_root }}/gluetun \
+        {{ host_mount_root }}/qbittorrent \
+        {{ host_mount_root }}/downloads \
+        {{ host_mount_root }}/media/tv \
+        {{ host_mount_root }}/media/movies \
+        {{ host_mount_root }}/media/music \
+        {{ host_mount_root }}/jellyfin \
+        {{ host_mount_root }}/seanime \
+        {{ host_mount_root }}/sonarr \
+        {{ host_mount_root }}/radarr \
+        {{ host_mount_root }}/music-grabber \
+        {{ host_mount_root }}/seerr \
+        {{ host_mount_root }}/prowlarr \
+        {{ host_mount_root }}/navidrome \
+        {{ host_mount_root }}/feishin \
+        {{ host_mount_root }}/immich/upload \
+        {{ host_mount_root }}/immich/model-cache \
+        {{ host_mount_root }}/immich/db \
+        {{ host_mount_root }}/affine/storage \
+        {{ host_mount_root }}/affine/config \
+        {{ host_mount_root }}/affine/postgres \
+        {{ host_mount_root }}/nextcloud \
+        {{ host_mount_root }}/nextcloud-db \
+        {{ host_mount_root }}/onlyoffice/data \
+        {{ host_mount_root }}/onlyoffice/logs \
+        {{ host_mount_root }}/gitea \
+        {{ host_mount_root }}/gh-runner/config \
+        {{ host_mount_root }}/gh-runner/work \
+        {{ host_mount_root }}/beszel \
+        {{ host_mount_root }}/uptime-kuma \
+        {{ host_mount_root }}/authentik/db \
+        {{ host_mount_root }}/authentik/redis \
+        {{ host_mount_root }}/authentik/media \
+        {{ host_mount_root }}/authentik/certs \
+        {{ host_mount_root }}/authentik/templates \
+        {{ host_mount_root }}/zerobyte \
+        {{ host_mount_root }}/vaultwarden \
+        {{ host_mount_root }}/n8n \
+        {{ host_mount_root }}/tdarr/server \
+        {{ host_mount_root }}/tdarr/configs \
+        {{ host_mount_root }}/tdarr/logs \
+        {{ host_mount_root }}/tdarr/cache \
+        {{ host_mount_root }}/mc
     # On SELinux hosts (Fedora/RHEL), newly created dirs under a home directory
     # inherit user_home_t which Docker containers cannot write to. Relabel to
     # container_file_t so bind mounts work without :Z on every volume entry.
-    chcon -Rt container_file_t {{host_mount_root}} 2>/dev/null || true
-    @echo "Host directories ready under {{host_mount_root}}/"
+    chcon -Rt container_file_t {{ host_mount_root }} 2>/dev/null || true
+    @echo "Host directories ready under {{ host_mount_root }}/"
 
 # ── Full stack (excludes extras) ──────────────────────────────────────────────
 
@@ -241,7 +241,7 @@ logs-extras:
 
 # Show all running containers across every stack
 ps:
-    docker ps --format "table {{{{.Names}}}}\t{{{{.Status}}}}\t{{{{.Ports}}}}"
+    docker ps --format "table {{{{.Names}}\t{{{{.Status}}\t{{{{.Ports}}"
 
 # Pull latest images for all stacks (extras included)
 pull:
