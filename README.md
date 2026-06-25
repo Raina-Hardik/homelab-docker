@@ -40,8 +40,8 @@ This document describes the current running architecture and how to operate it. 
 - Zerobyte (restic control plane)
 
 ### Dev
-- Forgejo (running in service/container `gitea`)
-- GitHub Actions self-hosted runner (profile-based, opt-in)
+- Forgejo (service: `forgejo`)
+- Forgejo Act Runner (profile-based, opt-in)
 
 ### Obs
 - Beszel hub
@@ -190,7 +190,7 @@ Common endpoints:
 - `https://affine.<TS_DOMAIN>`
 - `https://nextcloud.<TS_DOMAIN>`
 - `https://backup.<TS_DOMAIN>`
-- `https://gitea.<TS_DOMAIN>`
+- `https://forgejo.<TS_DOMAIN>`
 - `https://beszel.<TS_DOMAIN>`
 - `https://dozzle.<TS_DOMAIN>`
 - `https://uptime.<TS_DOMAIN>`
@@ -233,7 +233,7 @@ Use `.env.example` as the source of truth. Important groups:
 - Backup: `ZEROBYTE_APP_SECRET`
 - Obs: `BESZEL_KEY`
 - Auth: `ENCRYPTION_KEY`
-- Runner: `GITHUB_RUNNER_TOKEN`, `GITHUB_RUNNER_REPO`, `GITHUB_RUNNER_NAME`
+- Runner: `FORGEJO_RUNNER_TOKEN`, `FORGEJO_RUNNER_NAME`
 - Extras: `VAULTWARDEN_ADMIN_TOKEN`, `N8N_BASIC_AUTH_*`, `N8N_ENCRYPTION_KEY`
 - Games: `MC_MOTD`, `MC_LEVEL`
 
@@ -247,7 +247,7 @@ Some services need UI-driven setup after containers are healthy:
 - Pocket ID: configure providers/apps/policies via `https://pocketid.<TS_DOMAIN>`
 - Uptime Kuma: create monitors in UI at `https://uptime.<TS_DOMAIN>`
 - Tdarr: create a Flow at `https://tdarr.<TS_DOMAIN>` that (1) transcodes to H.265 using the `hevc_vaapi` encoder and (2) scales to ≤1080p. Add your media libraries pointing to `/media/tv`, `/media/movies`, `/media/anime`, `/media/music`.
-- Runner: generate a fresh GitHub runner registration token, set env vars, run `just up-runner`
+- Runner: generate a registration token in Forgejo (Site Admin → Actions → Runners → Create Runner), set `FORGEJO_RUNNER_TOKEN` in `.env`, then run `just up-runner`
 
 ## Notes
 

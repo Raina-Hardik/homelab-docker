@@ -152,7 +152,7 @@ backup.{$TS_DOMAIN} {
 forgejo.{$TS_DOMAIN} {
 	bind tailscale/forgejo
 	import common
-	import common_proxy gitea:3000
+	import common_proxy forgejo:3000
 }
 
 # ── Obs ───────────────────────────────────────────────────────────────────────

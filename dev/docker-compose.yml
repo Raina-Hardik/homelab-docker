@@ -1,8 +1,8 @@
 services:
-  # ── Gitea ─────────────────────────────────────────────────────────────────────
-  gitea:
+  # ── Forgejo ───────────────────────────────────────────────────────────────────
+  forgejo:
     image: codeberg.org/forgejo/forgejo:15
-    container_name: gitea
+    container_name: forgejo
     restart: unless-stopped
     ports:
       # Git-over-SSH from the host on a non-conflicting port; keep host SSH on 22.
@@ -18,7 +18,7 @@ services:
       - GITEA__server__SSH_DOMAIN=forgejo.${TS_DOMAIN}
       - GITEA__server__SSH_PORT=2222
     volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gitea:/data
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/forgejo:/data
     healthcheck:
       test:
         [
@@ -32,46 +32,32 @@ services:
     networks:
       - homelab
 
-  # ── GitHub Actions Runner ─────────────────────────────────────────────────────
-  # Personal runner scoped to a single repo. Useful for tasks like building Docker
-  # images, pushing to ECS, running tests, etc. on your own hardware.
+  # ── Forgejo Act Runner ────────────────────────────────────────────────────────
+  # Self-hosted runner scoped to your Forgejo instance. Runs CI/CD workflows
+  # defined in .forgejo/workflows/ (compatible with GitHub Actions YAML syntax).
   #
-  # GITHUB_RUNNER_TOKEN: generate a runner registration token from:
-  # GitHub repo → Settings → Actions → Runners → New self-hosted runner
-  # The token is single-use and expires after 1 hour. Regenerate if needed.
-  gh-runner:
-    image: myoung34/github-runner:latest
-    container_name: gh-runner
+  # FORGEJO_RUNNER_TOKEN: generate a registration token from:
+  # Forgejo → Site Admin → Actions → Runners → Create Runner
+  # The token is single-use. Regenerate if registration fails.
+  forgejo-runner:
+    image: code.forgejo.org/forgejo/runner:6
+    container_name: forgejo-runner
     profiles: ["runner"]
+    user: "0:0"
     restart: unless-stopped
     depends_on:
-      gitea:
+      forgejo:
         condition: service_healthy
     environment:
-      - RUNNER_SCOPE=repo
-      - REPO_URL=${GITHUB_RUNNER_REPO}
-      - ACCESS_TOKEN=${GITHUB_RUNNER_TOKEN}
-      - RUNNER_NAME=${GITHUB_RUNNER_NAME}
-      - LABELS=homelab,self-hosted,linux,x64
-      - RUNNER_WORKDIR=/_work
-      - CONFIGURED_ACTIONS_RUNNER_FILES_DIR=/runner
-      - UNSET_CONFIG_VARS=true
+      - FORGEJO_INSTANCE_URL=https://forgejo.${TS_DOMAIN}
+      - FORGEJO_RUNNER_REGISTRATION_TOKEN=${FORGEJO_RUNNER_TOKEN}
+      - FORGEJO_RUNNER_NAME=${FORGEJO_RUNNER_NAME:-homelab-runner}
+      - FORGEJO_RUNNER_LABELS=homelab,self-hosted,linux,x64
       - TZ=${TZ}
     volumes:
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gh-runner/config:/runner
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/gh-runner/work:/_work
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/forgejo-runner:/data
       # Docker socket lets the runner build and push images without DinD
       - /var/run/docker.sock:/var/run/docker.sock
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "test -f /runner/.runner && pgrep -f Runner.Listener >/dev/null",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
     networks:
       - homelab
 

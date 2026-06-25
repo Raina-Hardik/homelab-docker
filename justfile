@@ -70,9 +70,8 @@ _mkdirs:
         {{ host_mount_root }}/nextcloud-db \
         {{ host_mount_root }}/onlyoffice/data \
         {{ host_mount_root }}/onlyoffice/logs \
-        {{ host_mount_root }}/gitea \
-        {{ host_mount_root }}/gh-runner/config \
-        {{ host_mount_root }}/gh-runner/work \
+        {{ host_mount_root }}/forgejo \
+        {{ host_mount_root }}/forgejo-runner \
         {{ host_mount_root }}/beszel \
         {{ host_mount_root }}/uptime-kuma \
         {{ host_mount_root }}/authentik/db \
@@ -182,16 +181,16 @@ down-dev:
 logs-dev:
     docker compose -f dev/docker-compose.yml logs -f
 
-# ── GitHub Runner (opt-in profile under dev stack) ───────────────────────────
+# ── Forgejo Runner (opt-in profile under dev stack) ──────────────────────────
 
 up-runner:
-    docker compose -f dev/docker-compose.yml --profile runner up -d gh-runner
+    docker compose -f dev/docker-compose.yml --profile runner up -d forgejo-runner
 
 down-runner:
-    docker compose -f dev/docker-compose.yml --profile runner rm -sf gh-runner
+    docker compose -f dev/docker-compose.yml --profile runner rm -sf forgejo-runner
 
 logs-runner:
-    docker compose -f dev/docker-compose.yml --profile runner logs -f gh-runner
+    docker compose -f dev/docker-compose.yml --profile runner logs -f forgejo-runner
 
 # ── Obs ───────────────────────────────────────────────────────────────────────
 
