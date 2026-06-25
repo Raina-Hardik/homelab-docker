@@ -13,11 +13,10 @@ services:
       - TZ=${TZ}
       - GITEA__server__PROTOCOL=http
       - GITEA__server__HTTP_PORT=3000
-      - GITEA__server__DOMAIN=gitea.${TS_DOMAIN}
-      - GITEA__server__ROOT_URL=https://gitea.${TS_DOMAIN}
-      - GITEA__server__SSH_DOMAIN=gitea.${TS_DOMAIN}
+      - GITEA__server__DOMAIN=forgejo.${TS_DOMAIN}
+      - GITEA__server__ROOT_URL=https://forgejo.${TS_DOMAIN}
+      - GITEA__server__SSH_DOMAIN=forgejo.${TS_DOMAIN}
       - GITEA__server__SSH_PORT=2222
-      - GITEA__server__START_SSH_SERVER=true
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/gitea:/data
     healthcheck:
