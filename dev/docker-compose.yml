@@ -17,6 +17,9 @@ services:
       - GITEA__server__ROOT_URL=https://forgejo.${TS_DOMAIN}
       - GITEA__server__SSH_DOMAIN=forgejo.${TS_DOMAIN}
       - GITEA__server__SSH_PORT=2222
+      - GITEA__actions__ENABLED=true
+      - GITEA__security__INSTALL_LOCK=true
+      - GITEA__security__SECRET_KEY=${FORGEJO_SECRET_KEY}
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/forgejo:/data
     healthcheck:
@@ -49,11 +52,16 @@ services:
       forgejo:
         condition: service_healthy
     environment:
-      - FORGEJO_INSTANCE_URL=https://forgejo.${TS_DOMAIN}
+      # Use internal Docker address so the runner doesn't need to route through Tailscale
+      - FORGEJO_INSTANCE_URL=http://forgejo:3000
       - FORGEJO_RUNNER_REGISTRATION_TOKEN=${FORGEJO_RUNNER_TOKEN}
       - FORGEJO_RUNNER_NAME=${FORGEJO_RUNNER_NAME:-homelab-runner}
       - FORGEJO_RUNNER_LABELS=homelab,self-hosted,linux,x64
       - TZ=${TZ}
+    # Register on first boot (idempotent — skipped if .runner already exists), then daemon
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - "[ -f /data/.runner ] || forgejo-runner register --no-interactive --instance \"$$FORGEJO_INSTANCE_URL\" --token \"$$FORGEJO_RUNNER_REGISTRATION_TOKEN\" --name \"$${FORGEJO_RUNNER_NAME:-homelab-runner}\" --labels \"$$FORGEJO_RUNNER_LABELS\" --config /data/config.yml; exec forgejo-runner daemon --config /data/config.yml"
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/forgejo-runner:/data
       # Docker socket lets the runner build and push images without DinD
