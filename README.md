@@ -92,13 +92,119 @@ This document describes the current running architecture and how to operate it. 
 
 ## Prerequisites
 
-- Docker Engine with Compose v2 (`docker compose`)
-- `just` command runner
-- Tailscale running on the host (not managed in this repo)
-- Linux host capabilities used by some services:
-  - `/var/run/tailscale/tailscaled.sock` mounted into Caddy
-  - `/dev/net/tun` for Gluetun
-  - `/dev/dri` for Jellyfin/Seanime/Tdarr hardware acceleration (Intel iGPU / VA-API)
+### Recommended Hardware
+
+This stack is designed around and tested on an Intel N-series / Core Ultra U-class mini PC. The reference build:
+
+| Component | Recommendation |
+|-----------|---------------|
+| CPU | Intel Core i5-1235U (or similar 12th-gen U/P-series) |
+| iGPU | Intel Iris Xe (required for VA-API hardware transcode in Jellyfin, Seanime, Tdarr) |
+| RAM | 16 GB minimum (32 GB recommended) — 16 GB is workable with zRAM enabled (see below) |
+| Boot/data drive | 250 GB NVMe SSD minimum for OS + Docker bind-mounts |
+| Bulk media | Any additional storage (HDD, second SSD, NAS mount) for `/mnt/docker` or media libraries |
+
+> Tested on Fedora Linux 44 (Server Edition). 16 GB is tight but stable with zRAM active and a 15 GB swapfile; services like Immich ML and Nextcloud will occasionally swap under concurrent load.
+
+### Host Software
+
+Install the following on the Linux host before cloning this repo:
+
+**Docker Engine** (Compose v2 built-in):
+```bash
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER   # log out and back in after this
+```
+
+**`just` command runner:**
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
+```
+
+**Tailscale** (must be running on the host — Caddy mounts its socket):
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up
+```
+
+### Intel VA-API Drivers (Hardware Acceleration)
+
+Required for Tdarr H.265 re-encoding and Jellyfin/Seanime hardware decode. On 12th-gen Intel (Alder Lake / Iris Xe) use the `iHD` driver, not the legacy `i965`:
+
+**Fedora:**
+```bash
+sudo dnf install -y intel-media-driver libva-utils
+```
+
+**Debian / Ubuntu:**
+```bash
+sudo apt install -y intel-media-va-driver-non-free libva-utils
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S intel-media-driver libva-utils
+```
+
+Verify the driver loads correctly:
+```bash
+LIBVA_DRIVER_NAME=iHD vainfo
+```
+
+You should see `VAProfileH264*` and `VAProfileHEVC*` entries. If you see errors, check that the running kernel has `i915` loaded (`lsmod | grep i915`).
+
+Add your user to the `render` group so Docker containers can access `/dev/dri` without running as root:
+```bash
+sudo usermod -aG render,video $USER
+```
+
+### Memory: zRAM + Swap
+
+With 16 GB RAM, enable zRAM and set a swap of 10–15 GB. This keeps the system stable when Immich ML, Nextcloud, and media containers all run concurrently.
+
+**zRAM** (`zram-generator` is included in Fedora by default; install on other distros if needed):
+```bash
+sudo dnf install -y zram-generator   # Fedora (likely already installed)
+sudo pacman -S zram-generator        # Arch
+```
+
+`/etc/systemd/zram-generator.conf`:
+```ini
+[zram0]
+zram-size = ram / 2
+compression-algorithm = zstd
+```
+
+**Swapfile (12 GB example):**
+```bash
+sudo fallocate -l 12G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap defaults 0 0' | sudo tee -a /etc/fstab
+```
+
+Tune swappiness to prefer zRAM over disk swap under normal load:
+```bash
+echo 'vm.swappiness=10' | sudo tee /etc/sysctl.d/99-swap.conf
+sudo sysctl -p /etc/sysctl.d/99-swap.conf
+```
+
+### Kernel Devices
+
+Confirm these exist before running `just up`:
+
+```bash
+ls /dev/net/tun       # Gluetun VPN tunnel
+ls /dev/dri/renderD*  # Intel iGPU for VA-API
+ls /var/run/tailscale/tailscaled.sock  # Caddy Tailscale integration
+```
+
+If `/dev/net/tun` is missing:
+```bash
+sudo modprobe tun
+echo 'tun' | sudo tee /etc/modules-load.d/tun.conf
+```
 
 ## First-Time Setup
 
