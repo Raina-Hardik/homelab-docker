@@ -135,8 +135,10 @@ services:
     environment:
       - LOG_LEVEL=info
       - TZ=${TZ}
+      - TMDB_API_KEY=${TMDB_API_KEY}
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/seerr:/app/config
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/seerr/themoviedb-index.js:/app/dist/api/themoviedb/index.js:ro
     dns:
       - 9.9.9.9 # Quad9
       - 1.1.1.1 # Cloudflare
