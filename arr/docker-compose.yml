@@ -13,7 +13,7 @@ services:
     environment:
       - VPN_PORT_FORWARDING=${VPN_PORT_FORWARDING}
       - VPN_PORT_FORWARDING_PROVIDER=${VPN_PORT_FORWARDING_PROVIDER}
-      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'curl -s "http://localhost:8080/api/v2/app/setPreferences" -d "json={\"listen_port\":${PORTS}}"'
+      - VPN_PORT_FORWARDING_UP_COMMAND=/bin/sh -c 'wget -O- --retry-connrefused --post-data "json={\"listen_port\":{{PORTS}}}" http://127.0.0.1:8080/api/v2/app/setPreferences'
       - VPN_SERVICE_PROVIDER=${VPN_SERVICE_PROVIDER}
       - VPN_TYPE=${VPN_TYPE}
       - OPENVPN_USER=${OPENVPN_USER}
