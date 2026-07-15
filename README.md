@@ -18,7 +18,6 @@ This document describes the current running architecture and how to operate it. 
 - FlareSolverr (Cloudflare bypass proxy for Prowlarr indexers, internal only)
 - Sonarr (TV show automation)
 - Radarr (movie automation)
-- Lidarr (music automation)
 - Tdarr (H.265/≤1080p re-encoder, Intel iGPU-accelerated via VA-API)
 
 ### Media
@@ -26,6 +25,7 @@ This document describes the current running architecture and how to operate it. 
 - Seanime (hardware-accelerated anime client/server)
 - Navidrome (music server)
 - Feishin (music player UI for Navidrome)
+- Music Grabber (music download automation)
 
 ### Cloud
 - AFFiNE (documentation/workspace)
