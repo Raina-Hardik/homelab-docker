@@ -68,6 +68,10 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TZ}
+      # Auto-purge DB records for files that no longer exist on disk, but only
+      # after a FULL scan (not every quick/incremental one) so a transient
+      # mount hiccup can't wipe ratings/playlists by mistake.
+      - ND_SCANNER_PURGEMISSING=full
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/navidrome:/data
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/music:/music:ro
