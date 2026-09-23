@@ -49,7 +49,7 @@ services:
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/seanime:/home/seanime/.config/Seanime
       - ./seanime.config.toml:/home/seanime/.config/Seanime/config.toml
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media:/anime
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/anime:/anime
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/downloads:/downloads
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:43211 || exit 1"]
