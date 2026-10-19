@@ -14,6 +14,9 @@ services:
     environment:
       - EULA=TRUE
       - TYPE=PAPER
+      # Pinned: unset means "latest", and Paper moving ahead of WorldEdit/WorldGuard
+      # crash-looped the server for six days. Bump deliberately, plugins first.
+      - VERSION=26.3
       - MEMORY=8192M                       # homelab idles at ~13% of 32 GB
       - UID=${PUID}
       - GID=${PGID}
