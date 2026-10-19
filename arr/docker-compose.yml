@@ -137,9 +137,18 @@ services:
       - LOG_LEVEL=info
       - TZ=${TZ}
       - TMDB_API_KEY=${TMDB_API_KEY}
+    # The image hardcodes a TMDB key that has expired. Swap in ours at start-up
+    # instead of bind-mounting a copy of the file, which breaks on every image
+    # update (the copy went stale and crash-looped Seerr). No-op if upstream
+    # changes that line.
+    command:
+      - sh
+      - -c
+      - >-
+        sed -i "s|api_key: '431a8708161bcd1f1fbe7536137e61ed'|api_key: process.env.TMDB_API_KEY \|\| '431a8708161bcd1f1fbe7536137e61ed'|"
+        /app/dist/api/themoviedb/index.js && exec npm start
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/seerr:/app/config
-      - ${HOST_MOUNT_ROOT:-/mnt/docker}/seerr/themoviedb-index.js:/app/dist/api/themoviedb/index.js:ro
     dns:
       - 9.9.9.9 # Quad9
       - 1.1.1.1 # Cloudflare
