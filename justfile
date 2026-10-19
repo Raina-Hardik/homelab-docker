@@ -195,6 +195,12 @@ down-runner:
 logs-runner:
     docker compose -f dev/docker-compose.yml --profile runner logs -f forgejo-runner
 
+# ── Minecraft ─────────────────────────────────────────────────────────────────
+
+# Check Paper + plugin versions and update (interactive; pass --check to only report, --yes to apply plugin updates)
+mc-update *args:
+    scripts/mc-update.sh {{ args }}
+
 # ── Music tag repair ──────────────────────────────────────────────────────────
 
 # Match the music library against MusicBrainz and write MusicBrainz IDs only.

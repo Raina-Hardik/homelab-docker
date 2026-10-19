@@ -371,6 +371,10 @@ Manual steps (these hold per-user secrets, so they can't live in git):
 2. **Recommendations to files**: in Music Grabber, add your ListenBrainz username as a watched playlist source; it fans out into your "Created for You" playlists.
 3. **Last.fm**: create an API account at last.fm/api/account/create, fill the two `.env` values, `just up-media`.
 
+## Minecraft updates
+
+Paper is pinned in `games/docker-compose.yml` (`VERSION=`) because an unpinned server once crash-looped for days when Paper moved ahead of WorldEdit/WorldGuard. `just mc-update` (needs `gum`, `jq`, `unzip`, `curl`; run it on the host that runs the container) lists the pin and every plugin jar against upstream (Paper's API and Modrinth), then lets you pick updates. It can also bump the pin, but only to a version every managed plugin has a release for. Old jars go to `plugins-backup/` in the server data directory. Use `just mc-update --check` to only report. Worlds are upgraded in place on a version bump and can't be rolled back, so back them up first.
+
 ## Notes
 
 - Homepage host allow-list is set to `home.<TS_DOMAIN>`
