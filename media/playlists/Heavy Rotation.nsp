@@ -1,0 +1,14 @@
+{
+  "name": "Heavy Rotation",
+  "comment": "Smart playlist, see media/playlists in the homelab repo",
+  "all": [
+    {
+      "inTheLast": {
+        "lastplayed": 30
+      }
+    }
+  ],
+  "sort": "playcount",
+  "order": "desc",
+  "limit": 50
+}

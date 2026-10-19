@@ -1,0 +1,25 @@
+# One-shot tag repair for the music library. Not a running service: invoke it
+# with `just retag-music`. Matches each file against MusicBrainz and writes only
+# the MBIDs, which is what Navidrome's similar-artist / ListenBrainz features key
+# off (see plugins/idsonly.py). Files are never moved, copied or
+# renamed, and artist/title/date/genre tags are left exactly as they were.
+
+directory: /music
+library: /config/library.db
+
+pluginpath: /config/plugins
+plugins: musicbrainz idsonly
+
+import:
+  write: yes
+  copy: no
+  move: no
+  singletons: yes        # the library is Singles/<Artist>/<Title>
+  autotag: yes
+  quiet_fallback: skip   # with -q (just retag-music): only strong matches applied, rest skipped
+  incremental: yes       # remembered in library.db, so re-runs only see new files
+  incremental_skip_later: yes
+  log: /config/import.log
+
+match:
+  strong_rec_thresh: 0.10   # beets default; anything weaker waits for the interactive pass

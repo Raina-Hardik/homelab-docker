@@ -355,6 +355,22 @@ Some services need UI-driven setup after containers are healthy:
 - Tdarr: create a Flow at `https://tdarr.<TS_DOMAIN>` that (1) transcodes to H.265 using the `hevc_vaapi` encoder and (2) scales to ≤1080p. Add your media libraries pointing to `/media/tv`, `/media/movies`, `/media/anime`, `/media/music`.
 - Runner: generate a registration token in Forgejo (Site Admin → Actions → Runners → Create Runner), set `FORGEJO_RUNNER_TOKEN` in `.env`, then run `just up-runner`
 
+## Music discovery
+
+What the repo wires up for you (`just pull up` is enough):
+
+- **Smart playlists** from `media/playlists/*.nsp`: Heavy Rotation, Rediscover (loved, unplayed 90 days), New and Unplayed, Daily Mix. They are evaluated against the Navidrome `admin` user's plays/loves, not per listener.
+- **ReplayGain** tags on new downloads (Music Grabber), so volume is even across sources. Enable it in Feishin under Settings > Audio > Replay gain.
+- **Last.fm agent** in Navidrome when `LASTFM_API_KEY` / `LASTFM_API_SECRET` are set in `.env`. Similar artists stay mostly empty without it.
+
+Tag repair (run once, then after big imports): `just retag-music`. It matches files against MusicBrainz and writes only the MusicBrainz IDs, which Navidrome's similar-artist and ListenBrainz features key off. Artist, title, date and genre tags, and file names, are never touched (`media/beets/plugins/idsonly.py` strips everything else, because MusicBrainz data is wrong often enough for artists sharing a name). Only strong matches are applied; `just retag-music-review` walks the skipped ones interactively. Genres stay as downloaded, so YouTube-sourced files keep junk ones like "Entertainment".
+
+Manual steps (these hold per-user secrets, so they can't live in git):
+
+1. **Scrobbling**: in Navidrome, Personal > Settings, paste your ListenBrainz user token (listenbrainz.org/settings). Do the same for each user. This feeds the yearly Year in Music report and recommendations.
+2. **Recommendations to files**: in Music Grabber, add your ListenBrainz username as a watched playlist source; it fans out into your "Created for You" playlists.
+3. **Last.fm**: create an API account at last.fm/api/account/create, fill the two `.env` values, `just up-media`.
+
 ## Notes
 
 - Homepage host allow-list is set to `home.<TS_DOMAIN>`

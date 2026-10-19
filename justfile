@@ -50,12 +50,13 @@ _mkdirs:
         {{ host_mount_root }}/downloads \
         {{ host_mount_root }}/media/tv \
         {{ host_mount_root }}/media/movies \
-        {{ host_mount_root }}/media/music \
+        {{ host_mount_root }}/media/music/playlists \
         {{ host_mount_root }}/jellyfin \
         {{ host_mount_root }}/seanime \
         {{ host_mount_root }}/sonarr \
         {{ host_mount_root }}/radarr \
         {{ host_mount_root }}/music-grabber \
+        {{ host_mount_root }}/beets \
         {{ host_mount_root }}/seerr \
         {{ host_mount_root }}/prowlarr \
         {{ host_mount_root }}/navidrome \
@@ -128,6 +129,8 @@ logs-arr:
 # ── Media ─────────────────────────────────────────────────────────────────────
 
 up-media:
+    # Mountpoint for the smart playlists: Docker can't create it inside the read-only music mount.
+    mkdir -p {{ host_mount_root }}/media/music/playlists
     docker compose -f media/docker-compose.yml up -d
 
 down-media:
@@ -191,6 +194,20 @@ down-runner:
 
 logs-runner:
     docker compose -f dev/docker-compose.yml --profile runner logs -f forgejo-runner
+
+# ── Music tag repair ──────────────────────────────────────────────────────────
+
+# Match the music library against MusicBrainz and write MusicBrainz IDs only.
+# Unattended: only strong matches are applied; the rest are skipped and logged.
+retag-music:
+    mkdir -p {{ host_mount_root }}/beets
+    docker compose -f media/docker-compose.yml --profile tools run --rm --entrypoint beet beets import -q /music
+    @echo "Done. Navidrome picks the new tags up on its next scan (or: Settings > Library > Rescan)."
+
+# Same, but prompts for the files the unattended pass skipped.
+retag-music-review:
+    mkdir -p {{ host_mount_root }}/beets
+    docker compose -f media/docker-compose.yml --profile tools run --rm --entrypoint beet beets import --timid /music
 
 # ── Obs ───────────────────────────────────────────────────────────────────────
 

@@ -72,9 +72,19 @@ services:
       # after a FULL scan (not every quick/incremental one) so a transient
       # mount hiccup can't wipe ratings/playlists by mistake.
       - ND_SCANNER_PURGEMISSING=full
+      # Artist bios / similar artists / top songs. Deezer and ListenBrainz work
+      # keyless out of the box; a Last.fm key adds much better similar-artist
+      # data. Empty = Last.fm stays off. Register at last.fm/api/account/create.
+      - ND_LASTFM_APIKEY=${LASTFM_API_KEY:-}
+      - ND_LASTFM_SECRET=${LASTFM_API_SECRET:-}
+      # Smart playlists (.nsp) tracked in this repo: Heavy Rotation, Rediscover,
+      # New and Unplayed, Daily Mix. Navidrome only looks for playlists inside
+      # the library, hence the nested mount below.
+      - ND_PLAYLISTSPATH=playlists
     volumes:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/navidrome:/data
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/music:/music:ro
+      - ./playlists:/music/playlists:ro
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4533 || exit 1"]
       interval: 30s
@@ -123,6 +133,9 @@ services:
       - DB_PATH=/data/music_grabber.db
       - ENABLE_MUSICBRAINZ=true
       - DEFAULT_CONVERT_TO_FLAC=true
+      # Loudness tags so tracks from different sources play at a similar volume
+      # (Feishin: Settings > Audio > Replay gain).
+      - ENABLE_REPLAYGAIN=true
       - NAVIDROME_URL=http://navidrome:4533
       - NAVIDROME_USER=admin
       - NAVIDROME_PASS=admin
@@ -139,6 +152,26 @@ services:
       - homelab
     depends_on:
       - navidrome
+
+  # ── Tag Repair (opt-in, one-shot) ─────────────────────────────────────────────
+  # Not started by `just up`. Run with `just retag-music` to match the library
+  # against MusicBrainz and write MBIDs only. Tags only, no file moves.
+  beets:
+    image: lscr.io/linuxserver/beets:latest
+    container_name: beets
+    profiles: [tools]
+    user: "${PUID}:${PGID}"
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/beets:/config
+      - ./beets/config.yaml:/config/config.yaml:ro
+      - ./beets/plugins:/config/plugins:ro
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/media/music:/music
+    networks:
+      - homelab
 
 networks:
   homelab:

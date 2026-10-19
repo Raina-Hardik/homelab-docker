@@ -1,0 +1,19 @@
+{
+  "name": "New and Unplayed",
+  "comment": "Smart playlist, see media/playlists in the homelab repo",
+  "all": [
+    {
+      "is": {
+        "playcount": 0
+      }
+    },
+    {
+      "inTheLast": {
+        "dateadded": 30
+      }
+    }
+  ],
+  "sort": "dateadded",
+  "order": "desc",
+  "limit": 100
+}

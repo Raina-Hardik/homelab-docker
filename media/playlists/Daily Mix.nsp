@@ -1,0 +1,13 @@
+{
+  "name": "Daily Mix",
+  "comment": "Smart playlist, see media/playlists in the homelab repo",
+  "all": [
+    {
+      "gt": {
+        "playcount": -1
+      }
+    }
+  ],
+  "sort": "random",
+  "limit": 50
+}
