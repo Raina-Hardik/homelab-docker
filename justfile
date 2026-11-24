@@ -36,8 +36,12 @@ default:
 
 # One-time setup: create the Docker network and all required host-mount directories.
 # Re-running is safe — mkdir -p and `docker network create ... || true` are idempotent.
-init: _network _mkdirs
+init: _network _mkdirs _seed
     @echo "Init complete. Fill in .env then run: just up"
+
+# Seed untracked config files from their tracked templates (never overwrites).
+_seed:
+    cp -n media/seanime.config.example.toml media/seanime.config.toml
 
 _network:
     docker network create homelab 2>/dev/null || true

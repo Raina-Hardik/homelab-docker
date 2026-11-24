@@ -1,3 +1,5 @@
 .env
 .host-mounts
 CLAUDE.md
+# Live Seanime config (seeded from media/seanime.config.example.toml)
+media/seanime.config.toml

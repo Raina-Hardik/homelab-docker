@@ -82,7 +82,8 @@ This document describes the current running architecture and how to operate it. 
 |   `-- docker-compose.yml
 |-- media/
 |   |-- docker-compose.yml
-|   `-- seanime.config.toml
+|   |-- seanime.config.example.toml
+|   `-- seanime.config.toml   (gitignored; seeded by `just init`)
 |-- obs/
 |   `-- docker-compose.yml
 |-- .env.example
@@ -378,7 +379,7 @@ Paper is pinned in `games/docker-compose.yml` (`VERSION=`) because an unpinned s
 ## Notes
 
 - Homepage host allow-list is set to `home.<TS_DOMAIN>`
-- Seanime config is tracked in `media/seanime.config.toml` and mounted into container
-- Seanime tracked config currently includes default password `admin`; change it for real deployments
+- Seanime config: `media/seanime.config.example.toml` is the tracked seed template; `just init` copies it to `media/seanime.config.toml` (gitignored, mounted into the container) if missing. Seanime rewrites the live file on upgrades, so it stays out of git.
+- The template password is only a startup seed (`change-me`); set a real one in the live file or in Seanime
 - All service UIs are accessed via Tailscale subdomains. Caddy handles reverse proxy routing with automatic HTTPS via Tailscale certificates.
 - Healthchecks are defined across all stacks and used by `depends_on: condition: service_healthy` where needed

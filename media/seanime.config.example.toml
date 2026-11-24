@@ -1,4 +1,8 @@
-version = '3.10.3'
+# Seed config for Seanime. `just init` copies this to seanime.config.toml if missing.
+# The live seanime.config.toml is gitignored: Seanime rewrites it (e.g. `version`) on upgrades.
+# The password below is only a startup seed; change it in the live file or in Seanime.
+
+version = '3.10.4'
 
 [cache]
 dir = '$SEANIME_DATA_DIR/cache'
@@ -24,7 +28,7 @@ dir = '$SEANIME_DATA_DIR/offline'
 [server]
 host = '0.0.0.0'
 offline = false
-password = 'admin'
+password = "change-me"
 port = 43211
 trustedproxies = ['172.18.0.0/16']
 usebinarypath = true
