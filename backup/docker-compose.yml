@@ -25,6 +25,8 @@ services:
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/storage:/backup/affine/storage:ro
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/config:/backup/affine/config:ro
       - ${HOST_MOUNT_ROOT:-/mnt/docker}/affine/postgres:/backup/affine/postgres:ro
+      # Forgejo: repos, LFS, avatars and its SQLite DB (gitea.db)
+      - ${HOST_MOUNT_ROOT:-/mnt/docker}/forgejo:/backup/forgejo:ro
     healthcheck:
       test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4096 || exit 1"]
       interval: 30s
