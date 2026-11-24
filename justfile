@@ -23,6 +23,10 @@ set windows-shell := ["pwsh.exe", "-NoProfile", "-Command"]
 # export PGID := 1000
 host_mount_root := env('HOST_MOUNT_ROOT', './mnt/docker')
 
+# Machine name of whoever runs `just` (bash sets HOSTNAME but does not export it,
+# so compose would otherwise see it blank). Override in .env if the Tailscale name differs.
+export HOSTNAME := env('HOSTNAME', `hostname -s`)
+
 # ── Default ───────────────────────────────────────────────────────────────────
 
 default:
