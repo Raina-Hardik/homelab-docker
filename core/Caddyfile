@@ -147,6 +147,14 @@ backup.{$TS_DOMAIN} {
 	import common_proxy zerobyte:4096
 }
 
+# ── Games ─────────────────────────────────────────────────────────────────────
+
+scribl.{$TS_DOMAIN} {
+	bind tailscale/scribl
+	import common
+	import common_proxy scribble:8080
+}
+
 # ── Dev ───────────────────────────────────────────────────────────────────────
 
 forgejo.{$TS_DOMAIN} {

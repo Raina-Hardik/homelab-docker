@@ -55,6 +55,19 @@ services:
     networks:
       - homelab
 
+  # ── Scribble.rs ───────────────────────────────────────────────────────────────
+  # Self-hosted skribbl.io alternative. Lobbies are in-memory, so no volume.
+  # Reached via Caddy at scribl.<TS_DOMAIN> (HTTP + WebSockets on 8080).
+  # No healthcheck: the image is FROM scratch (no shell/wget to probe with).
+  scribble:
+    image: biosmarcel/scribble.rs:latest
+    container_name: scribble
+    restart: unless-stopped
+    environment:
+      - PORT=8080
+    networks:
+      - homelab
+
 networks:
   homelab:
     external: true
